@@ -23,9 +23,9 @@
      inkscape:pageopacity="0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="0.86241447"
-     inkscape:cx="-188.42448"
-     inkscape:cy="96.821195"
+     inkscape:zoom="4.878553"
+     inkscape:cx="286.86785"
+     inkscape:cy="135.38851"
      inkscape:window-width="1920"
      inkscape:window-height="1035"
      inkscape:window-x="0"
@@ -339,12 +339,10 @@
          y="148.33372"
          id="tspan59"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans';text-align:start;baseline-shift:baseline;text-anchor:start;fill:#0000ff;stroke-width:0.999999">(V<tspan
-   style="baseline-shift:baseline"
-   id="tspan58"><tspan
    style="font-size:65%;baseline-shift:sub"
-   id="tspan60">1</tspan>-V<tspan
+   id="tspan3">1</tspan>+V<tspan
    style="font-size:65%;baseline-shift:sub"
-   id="tspan61">O</tspan>)/2</tspan></tspan></text><text
+   id="tspan61">O</tspan>)/2</tspan></text><text
        xml:space="preserve"
        style="line-height:1.25;font-family:sans-serif;text-align:end;letter-spacing:0px;word-spacing:0px;baseline-shift:baseline;text-anchor:end;fill:#0000ff;stroke-width:0.999999"
        x="346.65128"

@@ -736,8 +736,8 @@
   ]
   #place(right+horizon)[
     $ V_1=2V_2 - V_L <=> 2V_2 = V_1 + V_L$
-    $ V_2=(V_1-V_O)/2 <=> V_O = V_1 - 2V_2 $
-    $ V_O = - V_L $
+    $ V_2=(V_1+V_O)/2 <=> V_O = 2V_2 - V_1 $
+    $ V_O = V_L $
   ]
 ]
 
