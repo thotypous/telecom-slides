@@ -218,7 +218,7 @@
 ]
 
 #polylux-slide[
-  Substituindo soluções do tipo $cos(omega t)$, temos:
+  Substituindo soluções do tipo $e^(j omega t)$, temos:
 
   #v(2em)
   $ (d V(z))/(d z) = -(R + j omega L) I(z) $
