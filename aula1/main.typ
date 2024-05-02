@@ -28,7 +28,7 @@
     + interface Ethernet
     + WSPR no satélite QO-100
     + IEEE 802.11 (Wi-Fi)
-  - Cinco _testinhos_ antes das práticas
+  - Cinco _mini testes_ antes das práticas
   - Seminário com apresentação de experimento próprio
 ]
 
@@ -36,7 +36,7 @@
   == Avaliação
 
   - 50% -- práticas (em grupo)
-  - 20% -- quatro melhores testinhos (individual)
+  - 20% -- quatro melhores mini testes (individual)
   - 30% -- seminário (em grupo)
 ]
 
