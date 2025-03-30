@@ -222,7 +222,7 @@
 
   #v(2em)
   $ (d V(z))/(d z) = -(R + j omega L) I(z) $
-  $ (d I(z))/(d z) = -(G + j omega G) V(z) $
+  $ (d I(z))/(d z) = -(G + j omega C) V(z) $
 ]
 
 #polylux-slide[
