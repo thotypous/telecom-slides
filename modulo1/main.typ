@@ -1,25 +1,23 @@
-#import "@preview/polylux:0.3.1": *
-#import "@preview/fletcher:0.4.2" as fletcher: node, edge
-#import "@preview/cetz:0.2.2": canvas, plot
-
-#import themes.university: *
+#import "@preview/polylux:0.4.0": *
+#import "@preview/fletcher:0.5.7" as fletcher: node, edge
+#import "@preview/cetz:0.3.4": canvas
+#import "@preview/cetz-plot:0.1.1": plot
 
 // Make the paper dimensions fit for a presentation and the text larger
 #set page(paper: "presentation-16-9")
-#set text(font: "Inria Sans", size: 25pt)
+#set text(font: "Inria Sans", size: 25pt, lang: "pt", region: "br")
 
-// Use #polylux-slide to create a slide and style it using your favourite Typst functions
-#polylux-slide[
+#slide[
   #align(horizon + center)[
     = Tecnologia de Comunicação
 
-    Aula 1 -- Conceitos básicos & modulação digital
+    Módulo 1 -- Conceitos básicos & modulação digital
 
     Prof. Paulo Matias
   ]
 ]
 
-#polylux-slide[
+#slide[
   == Apresentação da disciplina
 
   - Cinco _práticas_ acompanhadas dos conceitos relacionados:
@@ -32,7 +30,7 @@
   - Seminário com apresentação de experimento próprio
 ]
 
-#polylux-slide[
+#slide[
   == Avaliação
 
   - 50% -- práticas (em grupo)
@@ -40,7 +38,7 @@
   - 30% -- seminário (em grupo)
 ]
 
-#polylux-slide[
+#slide[
   == Objetivo da disciplina
 
   Transmitir informação por um canal e recebê-la do outro lado.
@@ -68,7 +66,7 @@
   - Em algumas tecnologias, há mais de um usuário compartilhando o mesmo canal.
 ]
 
-#polylux-slide[
+#slide[
   == Ruído gaussiano branco aditivo (AWGN)
   #v(1em)
   
@@ -84,7 +82,7 @@
 
 ]
 
-#polylux-slide[
+#slide[
   == Densidade espectral do AWGN
 
   #align(center)[
@@ -97,7 +95,7 @@
   Com $sigma=5$, temos $N_0=sigma^2=25 approx 10^(14/10)$
 ]
 
-#polylux-slide[
+#slide[
   Alguns autores distribuem $N_0/2$ para $f<0$ e $N_0/2$ para $f>=0$:
 
   #align(center)[
@@ -110,7 +108,7 @@
   Note que $N_0/2=12.5 approx 10^(11/10)$
 ]
 
-#polylux-slide[
+#slide[
   == Capacidade teórica de um canal AWGN
 
   Teorema de Shannon--Hartley:
@@ -125,7 +123,7 @@
   #text(size: 14pt)[Para uma prova do teorema, veja Wozencraft & Jacobs, _Principles of Communication Engineering_, 1966, pp. 323--342.]
 ]
 
-#polylux-slide[
+#slide[
   Mas $N$ depende de $B$, por exemplo:
   
   #canvas(length: 1cm, {
@@ -155,7 +153,7 @@
   Se $B=f_4-f_1$, continuamos com $S=S_0 dot (f_3-f_2)$, \ mas $N=N_0 dot (f_4-f_1)$.
 ]
 
-#polylux-slide[
+#slide[
   E se pudermos escolher $B$ tão grande quanto quisermos?
 
   Lembrando que $C = B log_2(1 + S/N) = log_2(1 + S/(B dot N_0))^B $,
@@ -167,7 +165,7 @@
   
 ]
 
-#polylux-slide[
+#slide[
   Ainda na condição de $B->infinity$, e se quisermos comparar $C$, que é a taxa máxima teórica, com a taxa real $f_b$ do transmissor?
 
   
@@ -178,7 +176,7 @@
   $ C/f_b = E_b/N_0 log_2 e $
 ]
 
-#polylux-slide[
+#slide[
   #align(center)[Como $f_b <= C$,]
   
   $ 1 <= C/f_b $
@@ -188,7 +186,7 @@
   $ E_b/N_0 >= 1/(log_2 e) approx 0.693 approx -1.59 "dB" $
 ]
 
-#polylux-slide[
+#slide[
   - Gráficos de BER (taxa de bits errados) _vs_ $E_b/N_0$ são bastante usados para avaliar o desempenho de sistemas de telecomunicação.
 
   - Para chegar perto do limite teórico de $-1.59 "dB"$, além de banda muito superior à taxa de transmissão, é necessário usar códigos de correção de erro.
@@ -196,7 +194,7 @@
   - Estudaremos os códigos de correção de erro em uma aula futura.
 ]
 
-#polylux-slide[
+#slide[
   #align(center)[
     #image("jpl-shannon.svg", width: 72%)
     #v(-1em)
@@ -204,7 +202,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   == Teoria de linhas de transmissão
   #align(center)[
     #image("Transmission_line_element.svg", width: 73%)
@@ -217,7 +215,7 @@
   $ (partial i(z,t))/(partial z) = - G v(z,t) - C (partial v(z,t))/(partial t) $
 ]
 
-#polylux-slide[
+#slide[
   Substituindo soluções do tipo $e^(j omega t)$, temos:
 
   #v(2em)
@@ -225,7 +223,7 @@
   $ (d I(z))/(d z) = -(G + j omega C) V(z) $
 ]
 
-#polylux-slide[
+#slide[
   Substituindo uma equação na outra, e vice-versa, temos:
 
   $ (d^2V(z))/(d z^2) - gamma^2 V(z) = 0 $
@@ -237,7 +235,7 @@
   $ gamma = sqrt((R+j omega L)(G + j omega C)) $
 ]
 
-#polylux-slide[
+#slide[
   Convém separar $gamma$ em parte real ($alpha$) e parte imaginária ($beta$).
   
   - $alpha = frak("Re"){gamma}$ é a constante de atenuação
@@ -250,7 +248,7 @@
   Ou seja, $alpha=0$, que significa que a linha não atenua o sinal, \ e $beta=omega sqrt(L C)$. A velocidade de fase é $v_p = omega / beta$, que no caso da linha ideal dá $1/sqrt(L C)$ e é igual à velocidade de grupo.
 ]
 
-#polylux-slide[
+#slide[
   Em uma *linha de transmissão não ideal*, com $R!=0$ ou $G!=0$, temos atenuação e, além disso, a velocidade de fase é diferente da velocidade de grupo, o que causa dispersão do sinal conforme este se propaga pela linha:
 
   #fletcher.diagram(
@@ -263,13 +261,13 @@
   #text(size: 10pt)[Adaptado de Bertolotti, _Telegrapher's Equation_, disponível em #link("https://en.wikipedia.org/wiki/Telegrapher%27s_equations#/media/File:Telegrapher_equation.gif")[en.wikipedia.org].]
 ]
 
-#polylux-slide[
+#slide[
   A atenuação cresce com a frequência, efetivamente limitando a banda que pode passar pelo cabo.
   
   Os valores de $R$, $L$, $G$, $C$ podem variar com $omega$. Por exemplo, $R$ tende a aumentar com a frequência devido ao efeito pelicular (_skin effect_), fazendo com que a atenuação cresça com a frequência ainda mais rápido do que cresceria se $R$ fosse constante.
 ]
 
-#polylux-slide[
+#slide[
   #align(center)[
     Cabo de telefone 24 AWG isolado com polietileno
     #v(1em)
@@ -279,7 +277,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   #align(center)[
     Atenuação de um cabo de telefone 24 AWG isolado com polietileno
     #image("attenuation.svg", width: 85%)
@@ -288,7 +286,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   == Uma breve história da telefonia
   #place(left+horizon)[
     1870s: primeiras \ centrais telefônicas
@@ -300,7 +298,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   #align(center+horizon)[
     #image("Subs_ln_cct.gif", width: 98%)
     #v(-1em)
@@ -308,7 +306,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   #align(center+horizon)[
     #image("Cord_cct.gif", width: 95%)
     #v(-1em)
@@ -316,7 +314,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   #align(center+horizon)[
     _L-carrier system_ (FDM): 1930s -- 1970s
     
@@ -326,7 +324,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   #align(center+horizon)[
     _T-carrier system_ (TDM): 1960s -- hoje
     
@@ -336,7 +334,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   - Componentes como capacitores e transformadores de isolação limitam a resposta da linha próximo de DC.
   
   - O FDM utilizava uma separação de 4 kHz entre os canais.
@@ -349,7 +347,7 @@
 ]
 
 
-#polylux-slide[
+#slide[
   == Pulse Amplitude Modulation (PAM)
 
   #align(center)[
@@ -361,7 +359,7 @@
   $ x(t) = sum_n a[n]p(t-n T) $
 ]
 
-#polylux-slide[
+#slide[
   #align(center)[
     #image("pam_tx_rx.svg", width: 100%)
     #v(-0.5em)
@@ -376,7 +374,7 @@
   $ B(j omega) = F(j omega) H(j omega) X(j omega) $
 ]
 
-#polylux-slide[
+#slide[
     $ X(j omega) = A(e^(j Omega))|_(Omega=omega T) P(j omega) $
   
     $ B(j omega) = F(j omega) H(j omega) X(j omega) $
@@ -386,7 +384,7 @@
   - Precisamos que $P(j omega)!=0$, $H(j omega)!=0$ e $F(j omega)!=0$ em $|omega|<=pi/T$ para conseguir obter $A(e^(j Omega))$ em todo o intervalo $|Omega|<=pi$ a partir de $B(j omega)$.
 ]
 
-#polylux-slide[
+#slide[
   #align(center)[
     #image("pam_tx_rx.svg", width: 100%)
     #v(-0.5em)
@@ -400,7 +398,7 @@
   Note que se $g(0)=c$ e $g(n T)=0$ para $n!=0$, então $b(n T) = c dot a[n]$, ou seja, não há ISI --- pulsos emitidos em diferentes instantes de tempo não interferem uns com os outros no sinal $b(t)$.
 ]
 
-#polylux-slide[
+#slide[
   - Uma função que satisfaz essa condição é $g(t)=sin(pi/T t)/(pi/T t)$. Nesse caso,  $G(j omega)$ é constante no intervalo $|omega|<=pi/T$ e zero fora dele.
   
   - Na prática, é difícil trabalhar com pulsos no formato sinc porque eles decaem devagar. Uma alternativa comum é utilizar _raised cosine pulses_: $g(t)=sin(pi/T t)/(pi/T t) cos(beta pi/T t)/(1-(2 beta t/T)^2)$. Nesse caso, $G(j omega)$ fica contido num intervalo mais largo $|omega|<=pi/T (1+beta)$.
@@ -408,14 +406,14 @@
   - Deve-se projetar o pulso $p(t)$ e o filtro $f(t)$ para "anular" o efeito do canal $h(t)$, obtendo-se um $g(t)$ como acima. Se $H(j omega)=1$, adota-se $P(j omega)=F(j omega)=sqrt(G(j omega))$.
 ]
 
-#polylux-slide[
+#slide[
   A modulação PAM produz sinais em banda base, ou seja, de DC até uma certa frequência de corte.
 
   #v(1em)
   A seguir, veremos modulações que produzem um sinal em banda passante, ou seja, de uma frequência mínima até uma frequência máxima.
 ]
 
-#polylux-slide[
+#slide[
   == Frequency Shift Keying (FSK)
 
   #v(1em)
@@ -428,7 +426,7 @@
   - Se em vez disso o cosseno tiver uma amplitude constante $A$, \ FSK produz um sinal com envelope constante, que facilita o uso de amplificadores de alta eficiência.
 ]
 
-#polylux-slide[
+#slide[
   #place(left+horizon)[
     Duas maneiras de modular FSK:
 
@@ -444,7 +442,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   O modulador de fase contínua pode, ainda, ser generalizado como:
 
   $ s(t) = A cos(omega_c t + phi.alt(t)) $
@@ -460,7 +458,7 @@
   Mas, ao contrário do formalismo que desenvolvemos para o PAM, aqui $p$ atua de forma não linear sobre $s(t)$.
 ]
 
-#polylux-slide[
+#slide[
   == Phase Shift Keying (PSK)
 
   #v(1em)
@@ -471,7 +469,7 @@
   - Escolhe-se $theta_n=2 pi b_n/M+theta_0$ para utilizar $M$ opções de ângulos igualmente espaçados.
 ]
 
-#polylux-slide[
+#slide[
   Uma formulação alternativa é:
 
   $ s(t) = sum_n frak("Re"){a med e^(j theta_n) p(t-n T)e^(j omega_c t)} $
@@ -485,7 +483,7 @@
   onde $a_i [n] = a cos(theta_n)$ e $a_q [n] = a sin(theta_n)$
 ]
 
-#polylux-slide[
+#slide[
   Abaixo, visualizamos no plano IQ um caso especial de PSK com $M=4$, conhecido como QPSK.
 
   #align(center)[
@@ -495,7 +493,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   == Quadrature Amplitude Modulation (QAM)
 
   #align(center)[
@@ -505,7 +503,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   == Offset QPSK (OQPSK)
 
   QPSK com deslocamento de meio período entre as componentes.
@@ -517,7 +515,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   OQPSK limita as mudanças de fase a 90°, em vez dos 180° do QPSK.
 
   #align(center)[
@@ -527,7 +525,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   == Demodulação IQ
 
   Relembrando algumas identidades trigonométricas:
@@ -539,7 +537,7 @@
   $ sin^2(a) = 1/2 (sin^2(a) + 1-cos^2(a)) = 1/2 (1 - cos(2a)) $
 ]
 
-#polylux-slide[
+#slide[
   $ s(t) = I(t) cos(omega_c t) - Q(t) sin(omega_c t) $
   
   $ r_i (t) = s(t) cos(omega_t) = I(t) cos^2(omega_c t) - Q(t) sin(omega_c t) cos(omega_c t) \
@@ -551,7 +549,7 @@
   Aplica-se, então, um filtro passa-baixas para eliminar os termos que oscilam ao redor de $2omega_c$.
 ]
 
-#polylux-slide[
+#slide[
   #align(center)[
     #image("iq_demod.svg", width: 80%)
     #v(-1em)
@@ -559,7 +557,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   == Demodulação FSK (usando _tone filters_)
 
   #align(center)[
@@ -571,7 +569,7 @@
   $ G_k (z) = sum_(n=0)^(L-1) r^n e^(j Lambda_k n t_s) z^(-n) = (1 - r^L e^(j Lambda_k L t_s) z^(-L))/(1 - r e^(j Lambda_k t_s) z^(-1)), quad r = 1 - epsilon.alt $
 ]
 
-#polylux-slide[
+#slide[
   == Visão do FSK no plano IQ
 
   #align(center)[
@@ -583,7 +581,7 @@
   $ h = (2 omega_d)/omega_b = (Delta omega)/omega_b med, quad quad phi.alt(t) = tan_c^(-1)(Q(t)/I(t)) $
 ]
 
-#polylux-slide[
+#slide[
   == Demodulação FSK (a partir dos sinais IQ)
 
   $ d/(d t) [tan_c^(-1)(Q(t)/I(t))] = (I(t)Q'(t)-I'(t)Q(t))/(I^2(t)+Q^2(t)) $
@@ -596,7 +594,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   == Minimum Shift Keying (MSK)
 
   2FSK com fase contínua, $h=0.5$, $p$ retangular e símbolos $b[n]$ é equivalente a OQPSK com $p(t)=sin((pi t) / (2 T))$ e símbolos 
@@ -614,7 +612,7 @@
   A esse caso especial de FSK (e de OQPSK) dá-se o nome MSK.
 ]
 
-#polylux-slide[
+#slide[
   #align(center)[
     #image("msk_equivalence.png", width: 64%)
     #v(-1em)
@@ -622,7 +620,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   == Universal Asynchronous Receiver-Transmitter (UART)
 
   #align(center)[
@@ -634,7 +632,7 @@
   Usado para comunicação entre o modem de linha telefônica e o computador.
 ]
 
-#polylux-slide[
+#slide[
   #align(center)[
     #image("uart_sig.png", width: 90%)
     #v(-1em)
@@ -646,7 +644,7 @@
   Ou seja, ineficiente para passar por um canal com banda limitada!
 ]
 
-#polylux-slide[
+#slide[
   Para sincronizar o sinal no receptor, utiliza-se um relógio mais rápido que a taxa de transmissão e localiza-se a metade do pulso a partir da primeira queda de tensão do quadro (no _start bit_).
   
   #align(center)[
@@ -656,7 +654,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   == Breve histórico dos modems de linha telefônica
   #v(1em)
   #text(size: 24pt)[
@@ -679,7 +677,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   == Prática: Implementação de um modem V.21
 
   - Modulação 2FSK a uma taxa de 300 símbolos por segundo, em ambas as direções.
@@ -689,13 +687,13 @@
   - Quem atende a chamada telefônica transmite bits zero ("espaço") na frequência de 1850 Hz, e transmite bits um ("marca") na frequência de 1650 Hz.
 ]
 
-#polylux-slide[
+#slide[
   Fator de modulação:
   
   $ h = (1180-980)/300 = (1850-1650)/300 = 200/300 approx 0.67 $
 ]
 
-#polylux-slide[
+#slide[
   == Hardware de um modem de linha telefônica
 
   #align(center)[
@@ -706,7 +704,7 @@
 ]
 
 
-#polylux-slide[
+#slide[
   #align(center)[
     #image("dry_daa.svg", width: 70%)
     #v(-1em)
@@ -714,7 +712,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   #align(center)[
     Híbrido
     
@@ -724,13 +722,13 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   #align(center+horizon)[
     #image("simple_hybrid2.svg", width: 49%)
   ]
 ]
 
-#polylux-slide[
+#slide[
   #place(left+horizon)[
     #image("simple_hybrid3.svg", width: 49%)
   ]
@@ -741,7 +739,7 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   De volta à teoria de linhas de transmissão
   
   Substituindo a solução
@@ -766,7 +764,7 @@
   $ Z_0 = sqrt((R+j omega L)/(G + j omega C)) $
 ]
 
-#polylux-slide[
+#slide[
   O que significa $Z_0$?
 
   - Posso trocar uma linha de transmissão com impedância característica $Z_0$ por um equivalente Thevenin de \ impedância $Z_0$? *Não!*
@@ -774,7 +772,7 @@
   #align(center)[#image("tline_thevenin1.svg", width: 80%)]
 ]
 
-#polylux-slide[
+#slide[
   O que significa $Z_0$?
 
   - Posso trocar uma linha de transmissão com impedância característica $Z_0$ terminada com uma carga de impedância $Z_0$ por um equivalente Thevenin de impedância $Z_0$? *Sim*
@@ -782,7 +780,7 @@
   #align(center)[#image("tline_thevenin2.svg", width: 80%)]
 ]
 
-#polylux-slide[
+#slide[
   Problema: a impedância da linha telefônica não é bem padronizada
   #align(center)[
     #image("phone_line_impedance.png", width: 70%)
@@ -791,6 +789,6 @@
   ]
 ]
 
-#polylux-slide[
+#slide[
   National Semiconductor, _Optimal hybrid design_, disponível em #link("http://bitsavers.trailing-edge.com/components/national/_appNotes/AN-0397_Optimum_Hybrid_Design_Oct1999.pdf")[bitsavers.trailing-edge.com], apresenta uma abordagem para projetar um híbrido que funciona da melhor maneira possível para um intervalo de impedâncias $Z_L$.
 ]
