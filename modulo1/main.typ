@@ -21,10 +21,10 @@
   == Apresentação da disciplina
 
   - Cinco _práticas_ acompanhadas dos conceitos relacionados:
-    + modem V.21
-    + interface E1
-    + interface Ethernet
-    + WSPR no satélite QO-100
+    + Modem V.21
+    + Interface E1
+    + Interface Ethernet
+    + Antena Yagi-Uda / comunicação via satélite
     + IEEE 802.11 (Wi-Fi)
   - Cinco _mini testes_ antes das práticas
   - Seminário com apresentação de experimento próprio
@@ -109,6 +109,33 @@
 ]
 
 #slide[
+  == Demonstração de AWGN
+
+  $ s(t) = sin(2 pi f_0 t) quad "e" quad r(t) = s(t) + w(t) $
+
+  #align(center)[
+    #image("awgn_demo.svg", width: 88%)
+  ]
+
+  #grid(
+    columns: (1.2fr, 1fr),
+    gutter: 1.2em,
+    [
+      #text(size: 12pt)[
+        ```py
+        t = np.linspace(0, 1.2, 700)
+        s = np.sin(2*pi*5*t)
+        r = s + np.random.normal(0, sigma, size=t.shape)
+        ```
+      ]
+    ],
+    [
+      #text(size: 16pt)[Em qual valor de $sigma$ a frequência ainda é identificável visualmente?]
+    ],
+  )
+]
+
+#slide[
   == Capacidade teórica de um canal AWGN
 
   Teorema de Shannon--Hartley:
@@ -148,9 +175,11 @@
       })
   })
 
-  Se $B=f_3-f_2$, então $S=S_0 dot (f_3-f_2)$ e $N=N_0 dot (f_3-f_2)$.
-  
-  Se $B=f_4-f_1$, continuamos com $S=S_0 dot (f_3-f_2)$, \ mas $N=N_0 dot (f_4-f_1)$.
+  #text(size: 22pt)[
+    Se $B=f_3-f_2$, então $S=S_0 dot (f_3-f_2)$ e $N=N_0 dot (f_3-f_2)$.
+    
+    Se $B=f_4-f_1$, continuamos com $S=S_0 dot (f_3-f_2)$, \ mas $N=N_0 dot (f_4-f_1)$.
+  ]
 ]
 
 #slide[
@@ -190,8 +219,10 @@
   - Gráficos de BER (taxa de bits errados) _vs_ $E_b/N_0$ são bastante usados para avaliar o desempenho de sistemas de telecomunicação.
 
   - Para chegar perto do limite teórico de $-1.59 "dB"$, além de banda muito superior à taxa de transmissão, é necessário usar códigos de correção de erro.
+]
 
-  - Estudaremos os códigos de correção de erro em uma aula futura.
+#slide[
+  #align(center)[#image("coding_gain_concept.svg", width: 94%)]
 ]
 
 #slide[
@@ -265,6 +296,19 @@
   A atenuação cresce com a frequência, efetivamente limitando a banda que pode passar pelo cabo.
   
   Os valores de $R$, $L$, $G$, $C$ podem variar com $omega$. Por exemplo, $R$ tende a aumentar com a frequência devido ao efeito pelicular (_skin effect_), fazendo com que a atenuação cresça com a frequência ainda mais rápido do que cresceria se $R$ fosse constante.
+]
+
+#slide[
+  == Atenuação, dispersão e taxa de dados
+
+  #align(center)[
+    #image("eye_pam_lengths.svg", width: 80%)
+  ]
+
+  #set text(size: 20pt)
+  - Maior comprimento de cabo: menor abertura do olho no instante de decisão.
+  - Olho mais aberto: mais margem contra ruído e erro de temporização.
+  - Olho mais fechado: menor taxa possível ou necessidade de equalização.
 ]
 
 #slide[
@@ -379,7 +423,7 @@
   
     $ B(j omega) = F(j omega) H(j omega) X(j omega) $
   
-  - Precisamos conhecer $A(e^(j Omega))$ em todo o intervalo $|Omega|<=pi <=> |omega|<=pi/T$ para conseguir reconstruir $a[n]$.
+  - Precisamos conhecer $A(e^(j Omega))$ em todo o intervalo $|Omega|<=pi$ \ $ <=> |omega|<=pi/T$ para conseguir reconstruir $a[n]$.
 
   - Precisamos que $P(j omega)!=0$, $H(j omega)!=0$ e $F(j omega)!=0$ em $|omega|<=pi/T$ para conseguir obter $A(e^(j Omega))$ em todo o intervalo $|Omega|<=pi$ a partir de $B(j omega)$.
 ]
@@ -404,6 +448,18 @@
   - Na prática, é difícil trabalhar com pulsos no formato sinc porque eles decaem devagar. Uma alternativa comum é utilizar _raised cosine pulses_: $g(t)=sin(pi/T t)/(pi/T t) cos(beta pi/T t)/(1-(2 beta t/T)^2)$. Nesse caso, $G(j omega)$ fica contido num intervalo mais largo $|omega|<=pi/T (1+beta)$.
   
   - Deve-se projetar o pulso $p(t)$ e o filtro $f(t)$ para "anular" o efeito do canal $h(t)$, obtendo-se um $g(t)$ como acima. Se $H(j omega)=1$, adota-se $P(j omega)=F(j omega)=sqrt(G(j omega))$.
+]
+
+#slide[
+  #align(center)[
+    #image("pulse_compare.svg", width: 92%)
+  ]
+]
+
+#slide[
+  - Sinc: menor banda ideal, mas maior sensibilidade a erro de temporização.
+  - Raised cosine com $beta$ maior: olho mais robusto, porém com maior excesso de banda.
+  - Na prática, escolhemos um compromisso entre ocupação espectral e robustez à dessincronização.
 ]
 
 #slide[
@@ -484,7 +540,7 @@
 ]
 
 #slide[
-  Abaixo, visualizamos no plano IQ um caso especial de PSK com $M=4$, conhecido como QPSK.
+  Abaixo, visualizamos no plano IQ um caso especial de PSK com \ $M=4$, conhecido como QPSK.
 
   #align(center)[
     #image("qpsk.svg", width: 46%)
@@ -500,6 +556,16 @@
     #image("qam.svg", width: 42%)
     #v(-1em)
     #text(size: 10pt)[Oppenheim & Verghese, _6.011 Introduction to communication control and signal processing_, 2010, obtido de #link("https://ocw.mit.edu/courses/6-011-introduction-to-communication-control-and-signal-processing-spring-2010/d2df3fc906190f978ad666c9c63cdc5d_MIT6_011S10_chap12.pdf")[ocw.mit.edu].]
+  ]
+]
+
+#slide[
+  #align(center)[
+    #image("constellation_compare.svg", width: 96%)
+  ]
+  #text(size: 22pt)[
+    - Quanto mais densa a constelação, maior a eficiência espectral, mas maior o $E_b/N_0$ necessário para manter a BER baixa.
+    - BPSK e QPSK são mais robustas; 16-QAM e 64-QAM transmitem mais bits por símbolo, porém com menor distância mínima entre pontos.
   ]
 ]
 
@@ -558,6 +624,19 @@
 ]
 
 #slide[
+  == Erro no oscilador local
+
+  #align(center)[
+    #image("carrier_offset_demo.svg", width: 92%)
+  ]
+
+  #set text(size: 18pt)
+  - Erro de fase $Delta phi$: a constelação inteira sofre uma rotação fixa.
+  - Erro de frequência $Delta f$: a constelação continua girando com o tempo, \ exigindo _carrier recovery_.
+  - Esse problema aparece em praticamente todas as práticas, do V.21 ao 802.11.
+]
+
+#slide[
   == Demodulação FSK (usando _tone filters_)
 
   #align(center)[
@@ -592,6 +671,25 @@
     #v(-1em)
     #text(size: 10pt)[Šabanović, _Low-SNR Operation of FSK Demodulators_, obtido de #link("https://repository.tudelft.nl/islandora/object/uuid%3A98a156a1-3899-4d7c-86cd-dc223b73ab40")[repository.tudelft.nl].]
   ]
+]
+
+#slide[
+  == Comparação de métodos de demodulação FSK
+
+  #table(
+    columns: (1.2fr, 1.5fr, 1.8fr),
+    inset: 7pt,
+    stroke: 0.5pt,
+    align: horizon,
+    table.header(
+      [*Método*], [*Vantagens*], [*Desvantagens*]
+    ),
+    [Filtros de tom],[Simples, funciona sem IQ],[Necessita ajuste da largura dos filtros],
+    [Derivada da fase (IQ)],[Compacto, funciona com qualquer $h$],[Precisa de demodulador IQ prévio e é sensível a ruído na divisão],
+  )
+
+  #v(0.5em)
+  - Na prática P1, usaremos filtros de tom.
 ]
 
 #slide[
@@ -655,26 +753,151 @@
 ]
 
 #slide[
-  == Breve histórico dos modems de linha telefônica
-  #v(1em)
-  #text(size: 24pt)[
-    #table(
-      columns: (auto, auto, auto, auto, auto),
-      inset: 8pt,
-      align: horizon,
-      table.header(
-        [*Bit/s*], [*Símbolos/s*], [*Modulação*], [*Norma CCITT*], [*Ano*]
-      ),
-      [300],[300],[2FSK],[V.21],[1964],
-      [1200],[1200],[2FSK],[V.23],[1968],
-      [1200],[600],[QPSK],[V.22],[1980],
-      [2400],[600],[16QAM],[V.22bis],[1984],
-      [4800],[2400],[QPSK],[V.32],[1984],
-      [14400],[2400],[128QAM,TCM],[V.32bis],[1991],
-      [28800],[3429],[1024QAM,TCM],[V.fast(V.34)],[1994],
-      [56000],[8000],[PAM],[V.90],[1998],
-    )
+  == UART: tolerância a erro de clock
+
+  Para amostrar no centro do bit:
+
+  #align(center)[
+    $ 10 dot Delta T <= 0.5 T_"bit" $
+
+    $ abs(Delta T)/T_"bit" <= 0.05 approx 5 % $
   ]
+
+  - $5 %$: limite teórico, com oversampling tendendo a infinito.
+  - Em 16x, a tolerância prática é menor pela menor precisão temporal.
+]
+
+#slide[
+  == Breve histórico dos modems de linha telefônica
+  #set text(size: 22pt)
+  - *V.21* (1964, 300 bit/s): 2FSK simples, ainda no regime "um bit por símbolo".
+  - *V.22* (1980, 1.2 kbit/s): salto de eficiência espectral com 600 baud e 2 bits por símbolo.
+  - *V.32* (1984, até 9.6 kbit/s): cancelamento de eco + *TCM* bidimensional, rendendo cerca de *3.6 dB* de ganho de codificação.
+  - *V.32bis* (1991, 14.4 kbit/s): mesma arquitetura básica, mas com expansão da constelação para subir a taxa mantendo *2400 baud*.
+  - *V.34* (1994/1998, até 33.6 kbit/s): baud variável, probing, preênfase, shell mapping e um pré-codificador não linear acoplado ao Trellis.
+  - *V.90* (1998, 56 kbit/s downstream): o salto final veio do PCM digital, não de um canal analógico "melhor".
+]
+
+#slide[
+  == V.21 → V.22: o primeiro salto real
+
+  #set text(size: 22pt)
+  - *V.21:* 300 baud, 1 bit por símbolo, 2FSK.
+  - *V.22:* 600 baud, 2 bits por símbolo, 4-DPSK, ainda em _full-duplex_ por FDM.
+  - Conta da taxa já mostra o salto: $300 times 1 = 300$ bit/s → $600 times 2 = 1200$ bit/s.
+  - O ganho veio principalmente de *dobrar a taxa simbólica* e usar uma modulação em quadratura mais eficiente em banda que FSK.
+  - No V.21, o 2FSK fazia sentido pela simplicidade; no V.22, já valia usar um modem mais complexo para ganhar eficiência espectral.
+  - O V.22bis depois amplia a constelação para 16-QAM, mas a ruptura conceitual principal já tinha acontecido no V.22.
+]
+
+#slide[
+  == V.32 e V.32bis: a banda deixou de ser dividida
+
+  #align(center)[
+    #image("v32_echo_canceller.svg", width: 48%)
+  ]
+
+  #v(-1em)
+  #set text(size: 17.8pt)
+  - *V.22:* cada direção ocupava só uma parte da voz por FDM.
+  - *V.32:* o cancelador de eco permite TX e RX simultâneos sobre praticamente toda a banda útil, e o *TCM* introduz cerca de *3.6 dB* de ganho de codificação.
+  - *V.32bis:* mantém os mesmos *2400 baud* e a mesma ideia de TCM, mas amplia a constelação para chegar a *14.4 kbit/s*.
+]
+
+#slide[
+  #align(center)[
+    #image("photo_2026-02-13_08-57-29-2.jpg", width: 100%)
+    #v(-1em)
+    #text(size: 10pt)[Fotos de cabeamento telefônico: Guilherme Poletto, fevereiro de 2026.]
+  ]
+]
+
+#slide[
+  == Por que não bastava aumentar a potência?
+
+  - Muitos pares compartilham o mesmo cabo: aumentar demais a potência eleva a diafonia (_cross-talk_) nos pares vizinhos.
+  - Por isso os últimos kb/s não vieram de "gritar mais alto", e sim de ganhar margem em dB com codificação, shaping, equalização e uso mais inteligente da banda.
+]
+
+#slide[
+  == V.34: não era "só aumentar a QAM"
+
+  - O canal telefônico analógico já estava perto do limite: não dava para subir taxa só com mais potência ou mais pontos na constelação.
+  - O salto do V.32bis para o V.34 veio da combinação de *mais baud*, *ganho de codificação* e *ganho de shaping*.
+  - Em outras palavras: foi preciso otimizar ao mesmo tempo *a geometria da constelação*, *a sequência dos símbolos* e *a resposta do canal*.
+]
+
+#slide[
+  #align(center)[#image("shaping_gain_illustration.svg", width: 88%)]
+]
+
+#slide[
+  == Shell Mapping
+
+  - Ideia central: escolher pontos *mais internos* com maior frequência e deixar os pontos externos mais raros.
+  - Assim, a potência média cai sem reduzir a distância mínima entre vizinhos.
+  - Esse _shaping gain_ rende cerca de *0.8 dB* no V.34, porque a norma limita a expansão da constelação a cerca de *25%*; o teto teórico seria ~*1.53 dB*.
+]
+
+#slide[
+  == Pré-codificação não linear: combater ISI sem destruir o shaping
+
+  #align(center)[#image("precoder_concept.svg", width: 100%)]
+]
+
+#slide[
+  - Num DFE (Decision Feedback Equalizer) comum, decisões erradas no receptor entram no laço de realimentação e podem contaminar as próximas decisões.
+  - O V.34 usa um *pré-codificador não linear* em malha de realimentação com o codificador Trellis 4D, historicamente ligado à linhagem THP/LTF, mas implementado na norma como uma arquitetura acoplada ao mapper/trellis.
+]
+
+#slide[
+  == Baud rate adaptativo
+
+  - Ao contrário do V.32bis, que fica fixo em *2400 baud*, o V.34 testa a linha e escolhe a taxa simbólica mais alta que ainda deixa margem suficiente.
+  - A norma permite vários valores de baud; em linhas boas, o modem pode chegar ao teto de *3429 baud*.
+  - Então o salto do V.34 tem duas partes: *mais símbolos por segundo* e *mais bits por símbolo*.
+]
+
+#slide[
+  == Conta de padaria: por que 33.6 kb/s cabem
+
+  - Linha telefônica boa: *SNR ~ 34 dB*
+  - Alvo do V.34: $33600/3429 approx 9.8$ bits/símbolo
+  - Aproximação: $"SNR"_("req,dB") approx 10 log_10(2^b - 1) + Gamma_"dB"$.
+
+  #align(center)[
+    #text(size: 22pt)[
+      sem cod./shaping ($Gamma_"dB" approx 8.8$): 38.3 dB \
+      com ganho do V.32/V.32bis (~3.6 dB): 34.7 dB \
+      com ganhos extras do V.34 (~1.4 dB): 33.3 dB
+    ]
+  ]
+
+  - Conclusão: *33.6 kbit/s* só começa a caber em linha típica quando entram os ganhos extras do *V.34*.
+]
+
+#slide[
+  #align(center)[
+    #image("pstn_digital_network.svg", width: 100%)
+  ]
+]
+
+#slide[
+  == V.90: o último salto não foi analógico
+
+  - O _downstream_ explora a assimetria da rede: do provedor até a central o caminho já é digital/PCM.
+  - O servidor faz uma forma de *PAM* sobre os níveis quantizados da G.711; o cliente ainda enxerga uma forma de onda analógica depois do DAC da central.
+  - O teto ingênuo seria $8000 times 8 = 64$ kbit/s, mas vários níveis precisam ser descartados por potência, distância mínima e impairments digitais.
+  - Por isso a norma chega a *56 kbit/s downstream*, enquanto o retorno continua essencialmente no mundo V.34.
+]
+
+#slide[
+  == Por que implementar justamente o V.21?
+
+  - Porque ele é o ponto de entrada mais simples para entender um modem completo: modulação, demodulação, sincronismo, framing e interface com a linha.
+  - E ele não é "só uma curiosidade histórica": os sinais *CM/JM* da negociação *V.8* usam modulação *V.21* a *300 bit/s*, antes de sessões *V.32*, *V.34* ou *V.90*.
+  - Ou seja, mesmo os modems mais avançados ainda dependem dessa base no começo da chamada.
+  - Implementar o V.21 primeiro é aprender o alicerce sobre o qual os protocolos posteriores foram construídos.
 ]
 
 #slide[
@@ -691,6 +914,16 @@
   Fator de modulação:
   
   $ h = (1180-980)/300 = (1850-1650)/300 = 200/300 approx 0.67 $
+]
+
+#slide[
+  Até aqui, discutimos *como codificar bits em sinais*.
+
+  Para que um modem de linha telefônica funcione de verdade, ainda faltam três perguntas:
+
+  - Como acoplar o circuito eletrônico à linha com \ segurança e isolação?
+  - Como transmitir e receber ao mesmo tempo no mesmo \ par metálico?
+  - O que acontece quando a impedância da linha real não é exatamente a que gostaríamos?
 ]
 
 #slide[
@@ -740,6 +973,20 @@
 ]
 
 #slide[
+  #align(center)[
+    #image("hybrid_echo_demo.svg", width: 90%)
+  ]
+]
+
+#slide[
+  Limitações do híbrido na prática
+
+  - Se $Z_L$ real for diferente da impedância de referência usada no híbrido, o cancelamento deixa um eco residual.
+  - Esse eco atrapalha a recepção simultânea \ em sistemas _full-duplex_.
+  - Modems mais avançados, como V.32 e V.34, usam \ _echo cancellation_ adaptativo para reduzir esse problema.
+]
+
+#slide[
   De volta à teoria de linhas de transmissão
   
   Substituindo a solução
@@ -781,6 +1028,36 @@
 ]
 
 #slide[
+  O que acontece se a carga não for igual a $Z_0$?
+
+  - A impedância vista na entrada da linha deixa de ser apenas $Z_0$.
+  - Ela passa a depender de *duas coisas*: da impedância característica da linha e da impedância da carga na outra extremidade.
+  - Diz-se então que a linha pode atuar como um *transformador de impedância*.
+  - Às vezes isso atrapalha, porque produz reflexões; em outros casos pode ser útil e até desejado.
+  - Essa ideia voltará quando estudarmos casamento de impedância e antenas.
+]
+
+#slide[
+  Reflexões na carga
+
+  #align(center)[
+    $ Gamma = (Z_L - Z_0)/(Z_L + Z_0) $
+  ]
+
+  #set text(size: 21pt)
+  - Carga casada: $Z_L = Z_0 => Gamma = 0$
+  - Circuito aberto: $Z_L -> infinity => Gamma = +1$
+  - Curto-circuito: $Z_L = 0 => Gamma = -1$
+
+  #v(0.3em)
+  #align(center)[
+    $ "VSWR" = (1 + abs(Gamma))/(1 - abs(Gamma)) $
+  ]
+
+  - Quanto menor $abs(Gamma)$, melhor o casamento de impedância; isso será importante nas práticas com linhas, híbridos e antenas.
+]
+
+#slide[
   Problema: a impedância da linha telefônica não é bem padronizada
   #align(center)[
     #image("phone_line_impedance.png", width: 70%)
@@ -791,4 +1068,15 @@
 
 #slide[
   National Semiconductor, _Optimal hybrid design_, disponível em #link("http://bitsavers.trailing-edge.com/components/national/_appNotes/AN-0397_Optimum_Hybrid_Design_Oct1999.pdf")[bitsavers.trailing-edge.com], apresenta uma abordagem para projetar um híbrido que funciona da melhor maneira possível para um intervalo de impedâncias $Z_L$.
+]
+
+#slide[
+  == Conclusão
+
+  #set text(size: 24pt)
+  - Começamos com os limites fundamentais: ruído, SNR e capacidade.
+  - Depois vimos como diferentes modulações trocam *eficiência espectral*, *robustez* e *complexidade*.
+  - Na telefonia, os saltos históricos vieram de ideias cada vez mais sofisticadas: cancelamento de eco, codificação, shaping, precoding e uso assimétrico da rede.
+  - Por fim, voltamos ao mundo físico: linha, híbrido, reflexões e impedância também fazem parte do problema.
+  - As práticas vão justamente costurar essas duas visões: \ *DSP + circuito + canal real*.
 ]
