@@ -67,9 +67,12 @@
 
 ## Slide 13 — CRC-4 no E1
 
-- O CRC-4 do E1 monitora blocos de 8 quadros, aumentando a capacidade de supervisão além do simples acompanhamento de FAS/NFAS.
-- Mesmo quando a bancada usa `NO-CRC4`, o conceito é importante porque aparece em equipamentos e enlaces reais.
-- A principal ideia pedagógica é distinguir sincronismo de enquadramento e monitoração de qualidade do enlace.
+- O `CRC-4` é apresentado como reforço posterior ao sincronismo por `FAS/NFAS`, mas o foco principal do slide é a estrutura mostrada na tabela.
+- A leitura da tabela deve destacar quatro ideias: `16` quadros por multiframe CRC-4, `8` quadros por `SMF`, `C1..C4` transportados na `SMF` seguinte, e necessidade de agrupar duas `SMFs` para abrir espaço ao alinhamento externo e aos bits `E`.
+- A nuance temporal mais importante é que o bloco observado e o bloco que carrega `C1..C4` não são o mesmo. Os `C1..C4` de uma SMF carregam o CRC da `SMF` anterior.
+- Os bits C1..C4 enviados no primeiro SMF de um multiframe correspondem ao CRC-4 calculado sobre o segundo SMF do multiframe anterior; a transmissão do CRC sempre se refere ao SMF imediatamente anterior no tempo.
+- Ao calcular o CRC-4 de uma `SMF`, os campos `C1..C4` dessa `SMF` entram zerados. O cálculo do CRC-4 não é encadeado.
+- A síntese conceitual do slide é: a `SMF` basta para o bloco de CRC, mas o multiframe de `16` quadros continua necessário para o alinhamento externo.
 
 ## Slide 14 — Alarmes em E1
 

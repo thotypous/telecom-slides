@@ -298,25 +298,46 @@
 #slide[
   == CRC-4 no E1
 
-  #grid(
-    columns: (1.2fr, 1fr),
-    gutter: 1em,
-    [
-      - Sem CRC-4: receptor monitora apenas FAS/NFAS.
-      - Com CRC-4: verifica blocos de *8 quadros inteiros*.
-      - Bloco CRC: $8 times 256 = 2048$ bits.
-      - Polinômio gerador: $x^4 + x + 1$.
-      - Os 4 bits de resto vão no bit 1 dos TS0 dos quadros FAS seguintes.
-    ],
-    [
-      #image("E1_acterna_figure12.svg", width: 100%)
-      #v(-0.8em)
-      #text(size: 10pt)[Tibbs, _Pocket Guide to The world of E1_, 2002, obtido de #link("https://web.archive.org/web/20240429125245/https://web.fe.up.pt/~mleitao/STEL/Tecnico/E1_ACTERNA.pdf")[web.fe.up.pt].]
-    ],
-  )
+  #set text(size: 16pt)
+  - Recurso introduzido posteriormente que aumenta a robustez do sincronismo por FAS/NFAS.
+  #set text(size: 8pt)
+  #table(
+    columns: (1.45fr, 1.45fr, 1.05fr, 0.42fr, 0.42fr, 0.42fr, 0.42fr, 0.42fr, 0.42fr, 0.42fr, 0.42fr),
+    inset: 3pt,
+    stroke: 0.45pt,
+    align: center + horizon,
 
-  #v(0.2em)
-  #text(size: 18pt)[_No teste de bancada, o Cisco está configurado com `NO-CRC4`, mas o conceito é central na tecnologia E1 real._]
+    table.cell(rowspan: 2)[],
+    table.cell(rowspan: 2)[*Sub-multiframe (SMF)*],
+    table.cell(rowspan: 2)[*Frame number*],
+    table.cell(colspan: 8)[*Bits 1 to 8 of the frame*],
+    [*1*], [*2*], [*3*], [*4*], [*5*], [*6*], [*7*], [*8*],
+
+    table.cell(rowspan: 16)[*Multiframe*],
+    table.cell(rowspan: 8)[*I*],
+    [0], [$C_1$], [0], [0], [1], [1], [0], [1], [1],
+    [1], [0], [1], [A], [$S_("a4")$], [$S_("a5")$], [$S_("a6")$], [$S_("a7")$], [$S_("a8")$],
+    [2], [$C_2$], [0], [0], [1], [1], [0], [1], [1],
+    [3], [0], [1], [A], [$S_("a4")$], [$S_("a5")$], [$S_("a6")$], [$S_("a7")$], [$S_("a8")$],
+    [4], [$C_3$], [0], [0], [1], [1], [0], [1], [1],
+    [5], [1], [1], [A], [$S_("a4")$], [$S_("a5")$], [$S_("a6")$], [$S_("a7")$], [$S_("a8")$],
+    [6], [$C_4$], [0], [0], [1], [1], [0], [1], [1],
+    [7], [0], [1], [A], [$S_("a4")$], [$S_("a5")$], [$S_("a6")$], [$S_("a7")$], [$S_("a8")$],
+
+    table.cell(rowspan: 8)[*II*],
+    [8], [$C_1$], [0], [0], [1], [1], [0], [1], [1],
+    [9], [1], [1], [A], [$S_("a4")$], [$S_("a5")$], [$S_("a6")$], [$S_("a7")$], [$S_("a8")$],
+    [10], [$C_2$], [0], [0], [1], [1], [0], [1], [1],
+    [11], [1], [1], [A], [$S_("a4")$], [$S_("a5")$], [$S_("a6")$], [$S_("a7")$], [$S_("a8")$],
+    [12], [$C_3$], [0], [0], [1], [1], [0], [1], [1],
+    [13], [E], [1], [A], [$S_("a4")$], [$S_("a5")$], [$S_("a6")$], [$S_("a7")$], [$S_("a8")$],
+    [14], [$C_4$], [0], [0], [1], [1], [0], [1], [1],
+    [15], [E], [1], [A], [$S_("a4")$], [$S_("a5")$], [$S_("a6")$], [$S_("a7")$], [$S_("a8")$],
+  )
+  #set text(size: 16pt)
+  - $C_1$ a $C_4$ carregam o CRC-4, calculado com $G(x)=x^4 + x + 1$, da SMF anterior.
+  - Não há encadeamento: ao calcular o CRC-4 de uma SMF, os campos $C_1$ a $C_4$ dessa SMF entram zerados.
+  - Agrupar duas SMFs dá espaço para a sequência de alinhamento e para os bits E no bit 1 dos NFAS.
 ]
 
 // ============================================================
