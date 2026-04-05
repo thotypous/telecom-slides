@@ -192,26 +192,28 @@
 // SLIDE 9 — Estrutura do quadro E1
 // ============================================================
 #slide[
-  == Estrutura do quadro E1
+  == Estrutura do quadro E1 segundo #link("https://www.itu.int/rec/T-REC-G.704-198811-S/en")[ITU-T G.704]
 
+  #v(0.5em)
   #grid(
     columns: (1fr, 1fr),
     gutter: 1em,
     [
       #align(center)[
         *PCM31*
+        #v(-0.5em)
         #image("E1_acterna_PCM31.svg", width: 95%)
       ]
     ],
     [
       #align(center)[
         *PCM30*
+        #v(-0.5em)
         #image("E1_acterna_PCM30.svg", width: 95%)
       ]
     ],
   )
 
-  #v(0.5em)
   #text(size: 20pt)[
     - PCM31: TS0 para sincronismo, TS1--31 para tráfego.
     - PCM30: TS0 para sincronismo, TS16 para sinalização, demais para tráfego.
@@ -360,7 +362,7 @@
 // SLIDE 15 — Interface física E1
 // ============================================================
 #slide[
-  == Interface física E1 segundo G.703
+  == Interface física E1 segundo #link("https://www.itu.int/rec/T-REC-G.703/en")[ITU-T G.703]
 
   #grid(
     columns: (1.3fr, 1fr),
@@ -1268,7 +1270,7 @@
   #set text(size: 21pt)
   - *Física do enlace:* G.703, pulso, HDB3, comparadores.
   - *Temporização:* oversampling + DPLL.
-  - *Estrutura E1:* quadros, TS0, TS16, sincronismo.
+  - *Estrutura E1:* G.704, quadros, TS0, TS16, sincronismo.
   - *Enlace de dados:* HDLC + bit stuffing.
   - *Detecção de erros:* CRC.
   - *Telefonia clássica:* voz PCM + sinalização CAS / E&M / R2.
