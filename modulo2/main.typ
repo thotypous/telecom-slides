@@ -294,8 +294,25 @@
   #text(size: 14pt)[_Sinalização é lenta; voz e dados são rápidos. Por isso faz sentido tirar a sinalização do canal de voz e colocá-la em TS16._]
 ]
 
+
 // ============================================================
-// SLIDE 13 — CRC-4 no E1
+// SLIDE 13 — Alarmes em E1
+// ============================================================
+#slide[
+  == Alarmes em E1
+
+  #set text(size: 22pt)
+  - *RAI* (Remote Alarm Indication): bit A do NFAS avisa a ponta remota que algo está errado.
+  - *AIS* (Alarm Indication Signal): sequência quase toda em 1, para manter clock nos regeneradores.
+  - *Perda de frame sync:* três FAS incorretos consecutivos.
+  - *Perda de multiframe sync:* problema na estrutura de TS16.
+
+  #v(1em)
+  #text(size: 18pt)[_A Prática 2 trata apenas o sincronismo por FAS/NFAS; os demais alarmes aparecem aqui como parte da tecnologia E1 real._]
+]
+
+// ============================================================
+// SLIDE 14 — CRC-4 no E1
 // ============================================================
 #slide[
   == CRC-4 no E1
@@ -340,22 +357,6 @@
   - $C_1$ a $C_4$ carregam o CRC-4, calculado com $G(x)=x^4 + x + 1$, da SMF anterior.
   - Não há encadeamento: ao calcular o CRC-4 de uma SMF, os campos $C_1$ a $C_4$ dessa SMF entram zerados.
   - Agrupar duas SMFs dá espaço para a sequência de alinhamento e para os bits E no bit 1 dos NFAS.
-]
-
-// ============================================================
-// SLIDE 14 — Alarmes em E1
-// ============================================================
-#slide[
-  == Alarmes em E1
-
-  #set text(size: 22pt)
-  - *RAI* (Remote Alarm Indication): bit A do NFAS avisa a ponta remota que algo está errado.
-  - *AIS* (Alarm Indication Signal): sequência quase toda em 1, para manter clock nos regeneradores.
-  - *Perda de frame sync:* três FAS incorretos consecutivos.
-  - *Perda de multiframe sync:* problema na estrutura de TS16.
-
-  #v(1em)
-  #text(size: 18pt)[_A Prática 2 trata apenas o sincronismo por FAS/NFAS; os demais alarmes aparecem aqui como parte da tecnologia E1 real._]
 ]
 
 // ============================================================

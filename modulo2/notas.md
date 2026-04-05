@@ -65,7 +65,13 @@
 - O pulso decádico não é transportado “como áudio”: ele é detectado localmente e convertido em estados de sinalização.
 - Esse slide ajuda a separar voz codificada de supervisão do tronco.
 
-## Slide 13 — CRC-4 no E1
+## Slide 13 — Alarmes em E1
+
+- `RAI` indica à ponta remota que o receptor detectou falha significativa; `AIS` injeta um padrão que mantém a cadeia de regeneração ativa.
+- Em operação real, alarmes permitem localizar falhas sem confundir perda de tráfego com perda de clock ou de enquadramento.
+- A prática simplifica isso ao focar em FAS/NFAS, mas o panorama real do E1 inclui uma taxonomia de alarmes mais rica.
+
+## Slide 14 — CRC-4 no E1
 
 - O `CRC-4` é apresentado como reforço posterior ao sincronismo por `FAS/NFAS`, mas o foco principal do slide é a estrutura mostrada na tabela.
 - A leitura da tabela deve destacar quatro ideias: `16` quadros por multiframe CRC-4, `8` quadros por `SMF`, `C1..C4` transportados na `SMF` seguinte, e necessidade de agrupar duas `SMFs` para abrir espaço ao alinhamento externo e aos bits `E`.
@@ -73,12 +79,6 @@
 - Os bits C1..C4 enviados no primeiro SMF de um multiframe correspondem ao CRC-4 calculado sobre o segundo SMF do multiframe anterior; a transmissão do CRC sempre se refere ao SMF imediatamente anterior no tempo.
 - Ao calcular o CRC-4 de uma `SMF`, os campos `C1..C4` dessa `SMF` entram zerados. O cálculo do CRC-4 não é encadeado.
 - A síntese conceitual do slide é: a `SMF` basta para o bloco de CRC, mas o multiframe de `16` quadros continua necessário para o alinhamento externo.
-
-## Slide 14 — Alarmes em E1
-
-- `RAI` indica à ponta remota que o receptor detectou falha significativa; `AIS` injeta um padrão que mantém a cadeia de regeneração ativa.
-- Em operação real, alarmes permitem localizar falhas sem confundir perda de tráfego com perda de clock ou de enquadramento.
-- A prática simplifica isso ao focar em FAS/NFAS, mas o panorama real do E1 inclui uma taxonomia de alarmes mais rica.
 
 ## Slide 15 — Interface física E1 segundo G.703
 
