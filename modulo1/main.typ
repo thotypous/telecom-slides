@@ -374,7 +374,7 @@
     
     #image("tdm.svg", width: 95%)
     #v(-0.5em)
-    #text(size: 10pt)[Wavetek, _E1 Pocket Guide_, obtido de #link("https://web.fe.up.pt/~mleitao/STEL/Tecnico/E1_ACTERNA.pdf")[web.fe.up.pt].]
+    #text(size: 10pt)[Tibbs, _Pocket Guide to The world of E1_, 2002, obtido de #link("https://web.archive.org/web/20240429125245/https://web.fe.up.pt/~mleitao/STEL/Tecnico/E1_ACTERNA.pdf")[web.fe.up.pt].]
   ]
 ]
 
