@@ -192,7 +192,7 @@
 // SLIDE 9 — Estrutura do quadro E1
 // ============================================================
 #slide[
-  == Estrutura do quadro E1 segundo #link("https://www.itu.int/rec/T-REC-G.704-198811-S/en")[ITU-T G.704]
+  == Estrutura do quadro E1 segundo #link("https://www.itu.int/rec/T-REC-G.704/en")[ITU-T G.704]
 
   #v(0.5em)
   #grid(
