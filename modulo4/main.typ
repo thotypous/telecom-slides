@@ -1199,7 +1199,7 @@
     gutter: 0.7em,
     [
       *O que sai da simulação (NEC2/OpenEMS):*
-      - $Z_A(f) = R(f) + j X(f)$ no ponto de alimentação.
+      - $Z_A (f) = R(f) + j X(f)$ no ponto de alimentação.
       - Ganho, diretividade, padrão de radiação.
       - Distribuição de corrente nos segmentos.
       - Largura de banda onde SWR < 2.
