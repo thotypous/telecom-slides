@@ -16,7 +16,7 @@
     Módulo 2 -- E1, códigos de linha, sincronização, \
     enquadramento e sinalização
 
-    #text(size: 18pt)[Base teórica para a Prática 2]
+    #text(size: 18pt)[Da telefonia digital à implementação de uma interface E1]
 
     Prof. Paulo Matias
   ]
