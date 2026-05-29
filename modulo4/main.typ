@@ -131,6 +131,8 @@
     [
       *Sem supervisão: ISM e radiação restrita*
       - Equipamentos homologados de *radiação restrita*: Wi-Fi 2,4/5 GHz, BLE, LoRa 915 MHz, módulos 433 MHz.
+      - LoRa 915 MHz não é automaticamente "4 W": depende de BW, saltos, antena e certificado.
+      - Evite LoRa 433 MHz no Brasil: teto de 10 mW EIRP; 900 MHz tem regime mais favorável.
       - Sem proteção contra interferência; potência/antena/uso dependem da aplicação.
       - Rádio caseiro exigiria ensaios laboratoriais caros; use módulos homologados.
       - Normas: #link("https://informacoes.anatel.gov.br/legislacao/resolucoes/2017/936-resolucao-680")[Res. 680/2017] e #link("https://informacoes.anatel.gov.br/legislacao/atos-de-certificacao-de-produtos/2017/1139-ato-14448")[Ato 14448/2017].
@@ -144,7 +146,7 @@
 #slide[
   == Indicativos e regiões
 
-  #set text(size: 15pt)
+  #set text(size: 13.6pt)
   #grid(
     columns: (2.3fr, 1fr),
     gutter: 1em,
@@ -184,7 +186,7 @@
 #slide[
   == Plano de bandas brasileiro (visão geral)
 
-  #set text(size: 15pt)
+  #set text(size: 13.5pt)
   #table(
     columns: (0.6fr, 0.8fr, 0.8fr, 1.2fr),
     inset: 4pt,
@@ -1844,11 +1846,11 @@
   *Ideia central:*
   - 2 pontos determinam uma reta.
   - 3 pontos determinam uma parábola.
-  - $k$ pontos determinam um *polinômio de grau $k - 1$*.
+  - $k$ pontos determinam um *polinômio de grau $< k$*.
 
-  *Visão didática*: dados são os coeficientes $(f_0, f_1, ..., f_(k-1))$ de um polinômio $f(x)$. A *palavra-código* é o vetor das avaliações
+  *Visão didática*: o codificador determina $f(x)$ de grau $< k$ tal que as primeiras $k$ avaliações sejam a mensagem. A *palavra-código* é o vetor das avaliações
   #align(center)[
-    $ (f(x_0), f(x_1), ..., f(x_(n-1))) $
+    $ (f(X_0), f(X_1), ..., f(X_(n-1))) $
   ]
   em $n >= k$ pontos distintos.
 
@@ -1883,11 +1885,12 @@
   == RS sobre GF($2^m$): bytes como pontos
 
   #set text(size: 15pt)
-  Convenção didática; implementações práticas, como IL2P, usam forma sistemática/cíclica equivalente:
-  - Mensagem = coeficientes de $f(x)$, com grau $< k$.
-  - Pontos de avaliação: $x_i = alpha^i$, para $i = 0, ..., n-1$.
-  - Codeword = $(f(alpha^0), f(alpha^1), ..., f(alpha^(n-1)))$.
-  - Em GF($2^8$), cada coeficiente e cada avaliação é um *byte*.
+  Codificação por avaliação em um corpo finito:
+  - Pontos de avaliação: $X_i = alpha^i$, para $i = 0, ..., n-1$.
+  - Palavra-código = $(f(alpha^0), f(alpha^1), ..., f(alpha^(n-1)))$.
+  - Mensagem = primeiros $k$ símbolos da palavra-código.
+  - Paridade = últimos $n-k$ símbolos da palavra-código.
+  - Em GF($2^8$), cada símbolo avaliado é um *byte*.
   - Comprimento máximo: $n <= 2^8 - 1 = 255$ (ponto zero é evitado).
 
   *Polinômio redutor* (define GF($2^8$)):
@@ -1909,29 +1912,57 @@
   == Decodificação RS: síndromes e localizador
 
   #set text(size: 14pt)
-  Convenção: recebemos pontos corrompidos
+  Convenção: recebemos símbolos corrompidos
   #align(center)[
-    $ y_i = f(alpha^i) + e_i $
+    $ y_i = f(X_i) + e_i, quad X_i = alpha^i $
   ]
   e não sabemos onde $e_i != 0$. As *síndromes* são combinações dos $y_i$ que zerariam sem erro.
 
-  Se há $t$ erros em posições $sigma(l)$, defina $X_l = alpha^(sigma(l))$:
+  Se há $t$ erros em posições $i_l$:
   #align(center)[
-    #text(size: 13pt)[$ S_j = sum_(l=1)^t e_l X_l^j, quad j=0, ..., n-k-1 $]
+    #text(size: 13pt)[$ S_r = sum_i y_i X_i^r = sum_(l=1)^t e_l X_(i_l)^r, quad r=1, ..., n-k $]
   ]
-  Isto é uma soma de $t$ exponenciais em GF($2^8$): achar $X_l$ dá as posições; achar $e_l$ dá as correções.
+  Isto é uma soma de $t$ exponenciais em GF($2^8$): achar $X_(i_l)$ dá as posições; achar $e_l$ dá as correções.
 
   O *localizador* codifica as posições:
   #align(center)[
-    $ Lambda(z) = product_(l=1)^t (1 - X_l z) $
+    $ Lambda(z) = product_(l=1)^t (1 - X_(i_l) z) $
   ]
 
-  - *Berlekamp-Massey*: encontra $Lambda(z)$ a partir das síndromes.
-  - *Chien*: testa potências de $alpha$; raízes $z = X_l^(-1)$ revelam as posições.
+  Agora falta descobrir $Lambda(z)$ a partir de $S_1, ..., S_(n-k)$ e transformar suas raízes em posições.
 ]
 
 // ============================================================
-// SLIDE 67 — Decodificação: avaliador e Forney
+// SLIDE 67 — Berlekamp-Massey e Chien
+// ============================================================
+#slide[
+  == Berlekamp-Massey e Chien: como ler
+
+  #set text(size: 14pt)
+  Da forma das síndromes,
+  #align(center)[
+    $ S_r = sum_(l=1)^t e_l X_(i_l)^r $
+  ]
+  cada parcela evolui multiplicando por $X_(i_l)$ quando $r$ aumenta.
+
+  *Consequência*: a sequência $S_r$ satisfaz uma recorrência linear:
+  #align(center)[
+    $ S_(r+t) + lambda_1 S_(r+t-1) + ... + lambda_t S_r = 0 $
+  ]
+  e os coeficientes dessa recorrência formam o localizador:
+  #align(center)[
+    $ Lambda(z) = 1 + lambda_1 z + ... + lambda_t z^t
+      = product_(l=1)^t (1 - X_(i_l) z) $
+  ]
+
+  *Berlekamp-Massey*: acha a menor recorrência compatível com $S_1, ..., S_(n-k)$.
+
+  *Chien*: testa $z = alpha^(-i)$. Se $Lambda(alpha^(-i)) = 0$, então a posição $i$ é uma posição de erro.
+
+]
+
+// ============================================================
+// SLIDE 68 — Decodificação: avaliador e Forney
 // ============================================================
 #slide[
   == Decodificação RS: avaliador e Forney
@@ -1942,27 +1973,280 @@
   Série de síndromes e *avaliador*:
   #align(center)[
     #set text(size: 12pt)
-    $ S(z) = sum_(j=0)^(n-k-1) S_j z^j $
+    $ S(z) = sum_(r=1)^(n-k) S_r z^(r-1) $
     $ Omega(z) = [Lambda(z) S(z)] mod z^(n-k) $
   ]
 
-  Para a posição $X_l = alpha^(sigma(l))$, a raiz de $Lambda$ é $X_l^(-1)$.
+  Para um erro na posição $i_l$, a raiz de $Lambda$ é $X_(i_l)^(-1)$.
 
   *Fórmula de Forney*:
   #align(center)[
-    $ e_l = - X_l dot Omega(X_l^(-1)) / Lambda'(X_l^(-1)) $
+    #text(size: 12.5pt)[$ z_l = X_(i_l)^(-1), quad e_l = - Omega(z_l) / (Lambda'(z_l)) $]
   ]
 
-  $Lambda'(z)$ é a derivada formal em GF($2^8$). Corrigir é subtrair $e_l$ de $y_(sigma(l))$.
+  $Lambda'(z)$ é a derivada formal em GF($2^8$). Corrigir é subtrair $e_l$ de $y_(i_l)$ (em GF($2^m$), soma e subtração coincidem).
 
   *Passos do decodificador*:
   #align(center)[
-    Síndromes $S_j$ $=>$ Berlekamp-Massey $=>$ Chien $=>$ Forney $=>$ correção
+    #text(size: 12.5pt)[Síndromes $S_r$ $=>$ Berlekamp-Massey $=>$ Chien $=>$ Forney $=>$ correção]
   ]
 ]
 
 // ============================================================
-// SLIDE 68 — IL2P: alternativa moderna ao AX.25
+// SLIDE 69 — Exemplo trabalhado de RS: codificação
+// ============================================================
+#slide[
+  == Exemplo trabalhado: codificação RS(7,3)
+
+  // Descrição para acessibilidade: exemplo numérico de codificação Reed-Solomon sistemática por avaliação. O slide usa GF(2 ao cubo), com alfa ao cubo igual a alfa mais 1. A mensagem original são os três primeiros símbolos da palavra-código: alfa à quinta, alfa ao cubo e alfa à quinta, representados pelos bits 111, 011 e 111. O codificador interpola um polinômio de grau menor que 3 que passa por esses três pontos e obtém f de x igual a 1 mais alfa x mais alfa ao quadrado x ao quadrado. A palavra-código é obtida avaliando f nos sete pontos 1, alfa, alfa ao quadrado até alfa à sexta; os quatro últimos símbolos são paridade.
+  #set text(size: 11.2pt)
+
+  Código didático sobre GF($2^3$), com $alpha^3 = alpha + 1$ e $alpha^7 = 1$.
+  Cada símbolo usa 3 bits na base $(alpha^2, alpha, 1)$.
+
+  *Forma sistemática por avaliação*: a mensagem ocupa os primeiros $k=3$ símbolos de $c$.
+
+  Mensagem original: $m = [alpha^5, alpha^3, alpha^5]$ $arrow.r$ bits `111 011 111`.
+
+  #v(0.15em)
+  #grid(
+    columns: (1.9fr, 0.8fr),
+    gutter: 5em,
+    [
+      Interpolação no codificador: encontre $f(x) = a_0 + a_1 x + a_2 x^2$ tal que:
+
+      #align(center)[
+        $a_0 + a_1 + a_2 = alpha^5$ \
+        $a_0 + alpha a_1 + alpha^2 a_2 = alpha^3$ \
+        $a_0 + alpha^2 a_1 + alpha^4 a_2 = alpha^5$
+      ]
+
+      #align(center)[
+        $arrow.r quad f(x) = 1 + alpha x + alpha^2 x^2$
+      ]
+
+      Depois avalie $c_i = f(X_i)$, com $X_i = alpha^i$.
+
+      #v(0.15em)
+      #table(
+        columns: (0.58fr, 0.44fr, 0.44fr, 0.52fr, 0.52fr, 0.52fr, 0.52fr, 0.52fr),
+        inset: 3pt,
+        stroke: 0.45pt,
+        align: horizon,
+        table.header([*posição $i$*], [$0$], [$1$], [$2$], [$3$], [$4$], [$5$], [$6$]),
+        [papel], [$m_0$], [$m_1$], [$m_2$], [$p_0$], [$p_1$], [$p_2$], [$p_3$],
+        [$X_i$], [$1$], [$alpha$], [$alpha^2$], [$alpha^3$], [$alpha^4$], [$alpha^5$], [$alpha^6$],
+        [$c_i=f(X_i)$], [$alpha^5$], [$alpha^3$], [$alpha^5$], [$alpha^6$], [$alpha^6$], [$alpha^3$], [$1$],
+        [bits de $c_i$], [`111`], [`011`], [`111`], [`101`], [`101`], [`011`], [`001`],
+      )
+
+      #v(0.15em)
+      Palavra transmitida:
+      #align(center)[
+        #text(size: 10.8pt)[$c = [alpha^5, alpha^3, alpha^5, alpha^6, alpha^6, alpha^3, 1]$]
+      ]
+      #align(center)[`111 011 111 101 101 011 001`]
+    ],
+    [
+      #table(
+        columns: (0.7fr, 1.15fr, 0.55fr),
+        inset: 3pt,
+        stroke: 0.45pt,
+        align: horizon,
+        table.header([*elem.*], [*polinômio*], [*bits*]),
+        [$0$], [$0$], [`000`],
+        [$1$], [$1$], [`001`],
+        [$alpha$], [$alpha$], [`010`],
+        [$alpha^2$], [$alpha^2$], [`100`],
+        [$alpha^3$], [$alpha + 1$], [`011`],
+        [$alpha^4$], [$alpha^2 + alpha$], [`110`],
+        [$alpha^5$], [$alpha^2 + alpha + 1$], [`111`],
+        [$alpha^6$], [$alpha^2 + 1$], [`101`],
+      )
+    ],
+  )
+]
+
+// ============================================================
+// SLIDE 70 — Exemplo trabalhado de RS: síndromes
+// ============================================================
+#slide[
+  == Exemplo trabalhado: RS(7,3) com 2 erros
+
+  // Descrição para acessibilidade: primeiro slide de decodificação do exemplo numérico de Reed-Solomon. A tabela mostra a palavra-código c calculada no slide anterior e a palavra recebida y. A palavra recebida tem dois símbolos diferentes da palavra transmitida, mas a decodificação ainda não conhece as posições nem as magnitudes dos erros. Embaixo, as síndromes calculadas diretamente de y são S1 igual a alfa, S2 igual a alfa à quarta, S3 igual a alfa e S4 igual a alfa à sexta.
+  #set text(size: 12.8pt)
+
+  Partimos do $c$ do slide anterior. Como $n-k=4$, RS(7,3) corrige até $t = 2$ erros de posição desconhecida.
+
+  #v(0.25em)
+  #table(
+    columns: (0.58fr, 0.44fr, 0.44fr, 0.52fr, 0.52fr, 0.52fr, 0.52fr, 0.52fr),
+    inset: 3pt,
+    stroke: 0.45pt,
+    align: horizon,
+    table.header([*posição*], [$0$], [$1$], [$2$], [$3$], [$4$], [$5$], [$6$]),
+    [$X_i = alpha^i$], [$1$], [$alpha$], [$alpha^2$], [$alpha^3$], [$alpha^4$], [$alpha^5$], [$alpha^6$],
+    [$c_i$ transmitido], [$alpha^5$], [$alpha^3$], [$alpha^5$], [$alpha^6$], [$alpha^6$], [$alpha^3$], [$1$],
+    [$y_i$ recebido], [$alpha^5$], [$alpha^3$], [$alpha^2$], [$alpha^6$], [$alpha^6$], [$alpha^3$], [$0$],
+  )
+
+  #v(0.25em)
+  O receptor não sabe onde estão os erros. Ele calcula síndromes diretamente de $y$:
+  #align(center)[
+    $S_r = sum_i y_i X_i^r, quad r = 1,2,3,4$
+  ]
+
+  #v(0.15em)
+  #table(
+    columns: (0.5fr, 1.9fr, 0.7fr),
+    inset: 3pt,
+    stroke: 0.45pt,
+    align: horizon,
+    table.header([*síndrome*], [*conta com a palavra recebida $y$*], [*resultado*]),
+    [$S_1$], [#text(size: 10.5pt)[$alpha^5 dot 1 + alpha^3 dot alpha + alpha^2 dot alpha^2 + alpha^6 dot alpha^3 + alpha^6 dot alpha^4 + alpha^3 dot alpha^5 + 0$]], [$alpha$],
+    [$S_2$], [#text(size: 10.5pt)[$alpha^5 dot 1 + alpha^3 dot alpha^2 + alpha^2 dot alpha^4 + alpha^6 dot alpha^6 + alpha^6 dot alpha + alpha^3 dot alpha^3 + 0$]], [$alpha^4$],
+    [$S_3$], [#text(size: 10.5pt)[$alpha^5 dot 1 + alpha^3 dot alpha^3 + alpha^2 dot alpha^6 + alpha^6 dot alpha^2 + alpha^6 dot alpha^5 + alpha^3 dot alpha + 0$]], [$alpha$],
+    [$S_4$], [#text(size: 10.5pt)[$alpha^5 dot 1 + alpha^3 dot alpha^4 + alpha^2 dot alpha + alpha^6 dot alpha^5 + alpha^6 dot alpha^2 + alpha^3 dot alpha^6 + 0$]], [$alpha^6$],
+  )
+]
+
+// ============================================================
+// SLIDE 71 — Exemplo trabalhado de RS: localizador
+// ============================================================
+#slide[
+  == Exemplo trabalhado: localizador
+
+  // Descrição para acessibilidade: segundo slide do exemplo numérico de Reed-Solomon. As quatro síndromes são usadas para montar o polinômio localizador Lambda de z. Duas equações lineares com S1, S2, S3 e S4 produzem lambda 1 igual a 1 e lambda 2 igual a alfa. O localizador final é Lambda de z igual a 1 mais z mais alfa z ao quadrado.
+  #set text(size: 15pt)
+
+  Síndromes:
+  #align(center)[
+    $S_1 = alpha, quad S_2 = alpha^4, quad S_3 = alpha, quad S_4 = alpha^6$
+  ]
+
+  Para dois erros, Berlekamp-Massey procura:
+  #align(center)[
+    $Lambda(z) = 1 + lambda_1 z + lambda_2 z^2$
+  ]
+
+  A recorrência associada é:
+  #align(center)[
+    $S_(r+2) + lambda_1 S_(r+1) + lambda_2 S_r = 0$
+  ]
+
+  Para $r=1$ e $r=2$:
+  #align(center)[
+    $alpha + lambda_1 alpha^4 + lambda_2 alpha = 0$ \
+    $alpha^6 + lambda_1 alpha + lambda_2 alpha^4 = 0$
+  ]
+
+  #v(0.1em)
+  Solução:
+  #align(center)[
+    $lambda_1 = 1, quad lambda_2 = alpha$
+    $quad arrow.r quad$
+    $Lambda(z) = 1 + z + alpha z^2$
+  ]
+]
+
+// ============================================================
+// SLIDE 72 — Exemplo trabalhado de RS: Chien
+// ============================================================
+#slide[
+  == Exemplo trabalhado: busca de Chien
+
+  // Descrição para acessibilidade: terceiro slide do exemplo numérico de Reed-Solomon. A busca de Chien avalia Lambda de alfa elevado a menos i para as sete hipóteses de posição. Uma tabela mostra os resultados: Lambda zera nas hipóteses i igual a 2 e i igual a 6. Portanto os erros estão nos símbolos cujos pontos são alfa ao quadrado e alfa à sexta.
+  #set text(size: 15pt)
+
+  Com $Lambda(z) = 1 + z + alpha z^2$, testamos:
+  #align(center)[
+    $z = alpha^(-i), quad i = 0, ..., 6$
+  ]
+
+  #v(0.3em)
+  #table(
+    columns: (0.55fr, 0.55fr, 0.55fr, 0.55fr, 0.55fr, 0.55fr, 0.55fr, 0.55fr),
+    inset: 5pt,
+    stroke: 0.45pt,
+    align: horizon,
+    table.header([*posição $i$*], [$0$], [$1$], [#text(fill: red)[$2$]], [$3$], [$4$], [$5$], [#text(fill: red)[$6$]]),
+    [$z = alpha^(-i)$], [$1$], [$alpha^6$], [#text(fill: red)[$alpha^5$]], [$alpha^4$], [$alpha^3$], [$alpha^2$], [#text(fill: red)[$alpha$]],
+    [$Lambda(z)$], [$alpha$], [$1$], [#text(fill: red)[$0$]], [$alpha^3$], [$alpha^3$], [$alpha$], [#text(fill: red)[$0$]],
+  )
+
+  #v(0.45em)
+  Se $Lambda(alpha^(-i)) = 0$, então há erro na posição $i$.
+
+  #align(center)[
+    zeros em $i = 2$ e $i = 6$
+    $quad arrow.r quad$
+    $X = alpha^2$ e $X = alpha^6$
+  ]
+]
+
+// ============================================================
+// SLIDE 73 — Exemplo trabalhado de RS: Forney
+// ============================================================
+#slide[
+  == Exemplo trabalhado: magnitudes e correção
+
+  // Descrição para acessibilidade: último slide de decodificação do exemplo numérico de Reed-Solomon. O slide calcula o avaliador Omega como Lambda vezes S módulo z à quarta, obtendo Omega igual a alfa mais alfa ao quadrado z. A derivada formal do localizador é 1. A fórmula de Forney calcula as magnitudes: para a posição 2, o erro é alfa ao cubo; para a posição 6, o erro é 1. A correção soma essas magnitudes aos símbolos recebidos e recupera alfa à quinta e 1. Como o código foi construído em forma sistemática, os três primeiros símbolos corrigidos recuperam a mensagem original.
+  #set text(size: 13.4pt)
+
+  Já sabemos as posições: $X_2 = alpha^2$ e $X_6 = alpha^6$.
+  Falta descobrir *quanto* corrigir em cada símbolo.
+
+  #v(0.2em)
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 0.9em,
+    [
+      *Avaliador*
+
+      #align(center)[
+        $S(z) = alpha + alpha^4 z + alpha z^2 + alpha^6 z^3$ \
+        $Lambda(z) = 1 + z + alpha z^2$
+      ]
+
+      #align(center)[
+        $Omega(z) = [Lambda(z) S(z)] mod z^4 = alpha + alpha^2 z$
+      ]
+
+      Derivada formal:
+      #align(center)[
+        $Lambda'(z) = (1 + z + alpha z^2)' = 1 + 2 alpha z = 1$
+      ]
+      #text(size: 12pt)[GF($2^m$) tem característica 2, então $2 alpha = alpha + alpha = 0$]
+    ],
+    [
+      *Forney*
+
+      #align(center)[
+        $z_i = X_i^(-1), quad e_i = -Omega(z_i) / (Lambda'(z_i))$
+      ]
+
+      Em GF($2^3$), o sinal de menos é igual ao de mais:
+      #align(center)[
+        $e_2 = Omega(alpha^5) = alpha^3$ \
+        $e_6 = Omega(alpha) = 1$
+      ]
+    ],
+  )
+
+  #v(0.35em)
+  Corrigir é somar a magnitude do erro ao símbolo recebido:
+  #align(center)[
+    $y_2 + e_2 = alpha^2 + alpha^3 = alpha^5$
+    $quad$
+    $y_6 + e_6 = 0 + 1 = 1$
+  ]
+
+  #v(0.2em)
+  #text(size: 12pt)[Resultado: $c$ corrigido. Como o código é sistemático, $[c_0,c_1,c_2] = [alpha^5, alpha^3, alpha^5]$ é a mensagem original.]
+]
+
+// ============================================================
+// SLIDE 74 — IL2P: alternativa moderna ao AX.25
 // ============================================================
 #slide[
   == IL2P: alternativa moderna ao AX.25
@@ -1988,7 +2272,7 @@
 ]
 
 // ============================================================
-// SLIDE 69 — IL2P: coding gain
+// SLIDE 75 — IL2P: coding gain
 // ============================================================
 #slide[
   == IL2P: ganho de codificação no orçamento
@@ -2010,7 +2294,7 @@
 ]
 
 // ============================================================
-// SLIDE 70 — Síntese
+// SLIDE 76 — Síntese
 // ============================================================
 #slide[
   == Síntese do módulo

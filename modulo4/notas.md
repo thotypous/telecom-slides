@@ -54,6 +54,22 @@
 - Para um balão estratosférico sem COER, não basta perguntar “433 ou 915?”. Se o transmissor for parte de uma estação `NSS`, Near Space Station, a norma do Serviço de Radioamador trata estações de alta altitude dentro da atmosfera e exige operador/estação dentro do SRA. Sem isso, o caminho teria que ser radiação restrita com equipamento homologado e condições de uso compatíveis com a aplicação. Um módulo LoRa homologado para uso geral em solo não deve ser presumido automaticamente válido para qualquer perfil de operação em balão, antena, altitude e duty cycle.
 - Em 433 MHz, há risco adicional de confusão com subfaixas de radioamador e com usos específicos do plano de 70 cm. Um payload transmitindo autonomamente em 433 MHz pode facilmente cair em uma aplicação que exige coordenação e habilitação se for tratado como radioamador, ou violar as condições de radiação restrita se for tratado como dispositivo comum. Além disso, o Ato 926/2024 não permite salto em frequência nem espalhamento espectral em faixas de radioamador abaixo de 440 MHz.
 - Em 915 MHz, a faixa é mais comum para `LoRaWAN`, isto é, uma rede de baixa potência e longo alcance construída sobre a modulação LoRa, e para telemetria de baixa potência no Brasil. Mas continua valendo a regra: equipamento homologado, antena dentro do permitido no certificado/manual, limites técnicos atendidos e ausência de interferência prejudicial. “É 915 MHz” não é autorização genérica.
+- A leitura regulatória correta para projetos com LoRa deve começar pela Resolução Anatel 680/2017, que define o regime de radiação restrita, e pelo Ato Anatel 14448/2017, que traz os requisitos técnicos de certificação. A página do Ato 14448 no site da Anatel é consolidada: ela mostra também alterações posteriores, inclusive alterações de 2025. Portanto, é melhor consultar a página oficial no momento do projeto, não uma cópia antiga em PDF.
+- Fontes principais para esta discussão: [Resolução Anatel 680/2017](https://informacoes.anatel.gov.br/legislacao/resolucoes/2017/936-resolucao-680), [Ato Anatel 14448/2017](https://informacoes.anatel.gov.br/legislacao/atos-de-certificacao-de-produtos/2017/1139-ato-14448) e, para o plano regional LoRaWAN, [LoRaWAN Regional Parameters RP002](https://resources.lora-alliance.org/technical-specifications/rp002-1-0-5-lorawan-regional-parameters).
+- Em `433-435 MHz`, o item `4.1.5` do Ato 14448 limita a potência irradiada a `10 mW EIRP`, isto é, `10 dBm EIRP`, e também impõe limites muito baixos para emissões fora da faixa: `250 nW EIRP` até `1000 MHz` e `1 µW EIRP` acima de `1000 MHz`. Isso é um teto da fundamental, não uma autorização para ignorar espúrios, harmônicos ou homologação.
+- O fato de LoRa ser uma modulação de espalhamento espectral por chirps não dá, em `433 MHz`, o benefício de potência do item `10`. O item `10` vale para equipamentos de espalhamento espectral ou modulação digital nas faixas `902-907,5 MHz`, `915-928 MHz`, `2400-2483,5 MHz` e `5725-5850 MHz`. A faixa de `433 MHz` não está nessa lista. Assim, LoRa em `433 MHz`, sem COER e fora do Serviço de Radioamador, deve ser tratado como equipamento de radiação restrita na faixa de `433-435 MHz`, respeitando `10 mW EIRP` e as demais condições do certificado.
+- A conta de EIRP deve incluir o sistema irradiante completo: `EIRP(dBm) = P_tx(dBm) - perdas_do_cabo(dB) + ganho_da_antena(dBi)`. Por exemplo, um módulo ajustado para `10 dBm` com antena de `2 dBi` e perdas desprezíveis já teria cerca de `12 dBm EIRP`, acima de `10 mW EIRP`. Nesse caso, seria necessário reduzir a potência conduzida para algo como `8 dBm` ou usar antena/perdas compatíveis.
+- Em `902-907,5 MHz` e `915-928 MHz`, se o equipamento não se enquadra nas regras específicas do item `10`, aplica-se o limite geral do item `4.1.4`: `50 mV/m` medidos a `3 m` para a fundamental. A conversão de campo elétrico para potência isotrópica equivalente em espaço livre vem de `E = sqrt(30*EIRP)/d`, ou seja, `EIRP = (E*d)^2/30`. Com `E = 0,05 V/m` e `d = 3 m`, obtemos `EIRP = (0,05*3)^2/30 = 0,00075 W = 0,75 mW`, aproximadamente `-1,25 dBm`. Esse valor é muito menor que os `10 mW` de `433 MHz`.
+- O item `10` não diz simplesmente “900 MHz pode 4 W”. Ele separa duas famílias: salto em radiofrequência, isto é, `FHSS`, e sequência direta/outras técnicas de modulação digital. Em ambos os casos há requisitos de faixa, largura de banda, potência conduzida, densidade espectral, ocupação de canal, emissões fora de faixa e antena. O número `4 W EIRP` aparece como consequência prática de `1 W` conduzido (`30 dBm`) combinado com uma antena de `6 dBi`, quando esse conjunto é permitido: `30 dBm + 6 dBi = 36 dBm`, e `36 dBm` corresponde a aproximadamente `4 W`.
+- Antena de ganho maior que `6 dBi` não permite simplesmente somar mais ganho e aumentar a EIRP. No item `10`, salvo exceções específicas de enlaces ponto-a-ponto em outras faixas, o ganho direcional acima de `6 dBi` exige reduzir a potência conduzida na quantidade de dB excedente. Assim, em `900 MHz`, trocar uma antena de `6 dBi` por uma de `12 dBi` não transforma `1 W` conduzido em `42 dBm EIRP`; a potência conduzida teria que cair cerca de `6 dB` para preservar o teto prático.
+- Para modulação digital sem salto, o item `10.3.1` exige largura de faixa a `6 dB` de pelo menos `500 kHz`. Além disso, a potência de pico máxima de saída do transmissor não pode exceder `1 W`, e a densidade espectral de potência, em qualquer faixa de `3 kHz` durante transmissão contínua, não pode exceder `8 dBm`. Portanto, LoRa em canal fixo com BW de `125 kHz`, `250 kHz` ou `300 kHz` não deve ser tratado automaticamente como elegível ao teto de `1 W` conduzido do item `10.3`; a largura efetivamente medida no ensaio é que importa.
+- Para salto em radiofrequência nas faixas brasileiras de `900 MHz`, o Ato 14448 exige uma lista pseudoaleatória de frequências de salto, uso médio equilibrado das frequências em transmissão contínua e espaçamento mínimo entre portadoras igual ao maior entre `25 kHz` e a largura de faixa do canal de salto a `20 dB`. Para `902-907,5 MHz` e `915-928 MHz`, a potência de pico máxima é `1 W` se o sistema usa no mínimo `35` canais de salto; se usa menos de `35`, a potência de pico máxima cai para `0,25 W`.
+- Ainda para `FHSS` em `900 MHz`, se a largura do canal de salto a `20 dB` for menor que `250 kHz`, o sistema deve usar no mínimo `35` frequências de salto e ocupar qualquer frequência por no máximo `0,4 s` em um intervalo de `14 s`. Se a largura a `20 dB` for maior ou igual a `250 kHz`, o mínimo cai para `17` frequências de salto, e a ocupação de qualquer frequência deve ser no máximo `0,4 s` em `7 s`. A largura ocupada máxima do canal de salto a `20 dB` é `500 kHz`.
+- Isso corrige um erro comum: para LoRa de `125 kHz` em `900 MHz`, o Ato 14448 brasileiro consolidado não exige `50` canais de salto; exige `35` frequências de salto para a regra de canal menor que `250 kHz`. O número `50` aparece em algumas discussões inspiradas na regra norte-americana, mas não é o número que consta no item `10.2.5.2` do Ato 14448.
+- Para BW em torno de `300 kHz`, a resposta depende do modo. Em canal fixo, `300 kHz` fica abaixo dos `500 kHz` exigidos para modulação digital sem salto, então não se deve assumir o teto de `1 W` conduzido; sem outro enquadramento específico aplicável, o sistema cai no limite geral de `0,75 mW EIRP`. Em `FHSS`, `300 kHz` cai no caso de largura a `20 dB` maior ou igual a `250 kHz`: precisa de pelo menos `17` frequências de salto, respeitar `0,4 s` em `7 s`, e a potência conduzida será `0,25 W` se usar de `17` a `34` canais, ou `1 W` se usar `35` ou mais. Com antena de `6 dBi`, isso dá, respectivamente, cerca de `1 W EIRP` ou `4 W EIRP`.
+- LoRaWAN não elimina essas condições. O plano regional `AU915-928`, usado como referência para o Brasil em muitas redes LoRaWAN, define múltiplos canais de uplink de `125 kHz` e também canais de `500 kHz`, mas a rede real pode operar somente uma sub-banda de `8` canais por causa do gateway, do servidor de rede ou da configuração do dispositivo. Se o dispositivo transmite efetivamente só em `8` canais de `125 kHz`, isso não satisfaz a condição de `35` frequências de salto para usar alta potência por `FHSS`.
+- Por outro lado, mesmo quando uma configuração LoRaWAN usa canais suficientes para satisfazer o Ato 14448, isso não significa que seja correto configurar `36 dBm EIRP`. O próprio perfil regional LoRaWAN pode estabelecer limites de EIRP menores, por exemplo `30 dBm` em versões usuais do `AU915`, e o certificado/manual do produto homologado pode impor potência, antena e firmware específicos. O limite regulatório da Anatel é teto externo; o limite operacional real é o menor entre a norma, o certificado, o manual, o perfil de rede e a configuração técnica.
+- Para sala de aula, a mensagem segura é: `433 MHz` com LoRa em radiação restrita é `10 mW EIRP` no máximo; `915 MHz` pode permitir potências muito maiores, mas apenas se o equipamento homologado e a configuração técnica atenderem exatamente aos requisitos de largura de banda, salto, ocupação, potência conduzida, antena e emissões. “O chip suporta LoRa” e “a frequência é 915 MHz” não bastam para concluir que `4 W EIRP` são legais.
 - Antena faz parte do sistema irradiante. Em radiação restrita, a Resolução 680 estabelece a ideia geral de que o equipamento deve ser projetado para usar apenas a antena comercializada com ele, exceto condições específicas previstas nos requisitos técnicos de certificação. Portanto, trocar a antena pode alterar a conformidade.
 - Em termos práticos, ligar uma antena externa em Wi-Fi, BLE ou LoRa homologado só é uma aposta segura quando a antena, o conector, o ganho, a faixa, a configuração de potência e o modo de instalação estão contemplados pela homologação ou pelo manual/certificado do produto. Se a homologação foi obtida com antena integrada ou com uma lista específica de antenas, substituir por uma Yagi, painel, colinear ou antena de maior ganho pode descaracterizar a certificação do conjunto.
 - Mesmo quando o rádio reduz potência automaticamente, o limite regulatório muitas vezes é expresso em e.i.r.p./PIRE ou densidade espectral radiada. A antena de maior ganho pode tornar ilegal um transmissor que, na bancada com antena original, estava dentro do limite.
@@ -799,8 +815,8 @@
 
 ## Slide 63 — Reed-Solomon: intuição visual
 
-- Reed-Solomon é um código corretor de erros por blocos. A intuição do slide é interpolação: se uma mensagem define um polinômio, avaliações redundantes desse polinômio permitem reconstruí-lo mesmo se algumas avaliações chegarem erradas.
-- A ideia “k pontos determinam polinômio de grau k-1” é a base. A mensagem contém `k` símbolos de informação; o codificador gera `n` símbolos avaliando ou, em implementações sistemáticas, adicionando paridade equivalente.
+- Reed-Solomon é um código corretor de erros por blocos. A intuição do slide é interpolação: a mensagem fixa `k` pontos de um polinômio de grau menor que `k`; avaliações redundantes desse mesmo polinômio permitem reconstruí-lo mesmo se algumas avaliações chegarem erradas.
+- A ideia “k pontos determinam um polinômio de grau menor que k” é a base. Na forma sistemática por avaliação, os `k` símbolos de informação são os primeiros `k` valores da palavra-código; o codificador interpola o polinômio e calcula mais `n-k` avaliações como paridade.
 - O código é útil contra erros em rajada porque opera em símbolos, normalmente bytes. Um byte completamente corrompido conta como um símbolo errado, independentemente de quantos bits dentro dele mudaram.
 - A figura com pontos deslocados mostra redundância geométrica. Se poucos pontos estão errados, ainda há uma única curva de grau baixo que explica a maioria dos pontos. O decodificador encontra essa curva e recupera a mensagem.
 - Na prática, decodificadores RS não testam todas as combinações de pontos. Usam algoritmos algébricos eficientes, como Berlekamp-Massey, Euclides estendido, Forney etc. A intuição geométrica ajuda a entender capacidade, não o algoritmo completo.
@@ -823,27 +839,39 @@
 - Reed-Solomon precisa de operações algébricas em um conjunto finito onde soma, subtração, multiplicação e divisão funcionam sem sair do conjunto. Esse conjunto é um corpo finito, como `GF(2^8)`.
 - Em `GF(2^8)`, cada elemento pode ser representado por um byte, mas as operações não são aritmética inteira comum. Soma é XOR; multiplicação é multiplicação de polinômios módulo um polinômio redutor irredutível.
 - O polinômio redutor define a “tabela de multiplicação” do campo. Diferentes padrões podem usar polinômios diferentes; transmissor e receptor precisam concordar.
+- A notação `GF(2^m)` nomeia o corpo abstrato, único até isomorfismo. Para representar esse corpo com `m` bits em software ou hardware, escolhemos uma construção concreta: `GF(2)[x] / p(x)`, onde `p(x)` é um polinômio irredutível de grau `m`. Por isso o polinômio redutor não aparece dentro dos parênteses de `GF(2^m)`, mas precisa ser fixado pela implementação ou pelo padrão.
+- Todo corpo com `2^m` elementos tem característica `2`: `1 + 1 = 0`. Logo, para qualquer elemento `a`, vale `a + a = (1+1)a = 0`. Na representação binária isso aparece como XOR; abstratamente, é consequência de o corpo ter tamanho potência de `2`.
 - O elemento `alpha` é escolhido como elemento primitivo ou gerador: suas potências percorrem os elementos não nulos do campo. Por isso um código RS sobre `GF(2^8)` tem comprimento máximo típico `255`, que é `2^8 - 1`.
-- A visão por avaliações de polinômio é didática. Implementações reais frequentemente usam forma sistemática/cíclica: os `k` bytes de dados aparecem literalmente no codeword e os `n-k` bytes de paridade são anexados. A capacidade de correção é a mesma.
+- Exemplo em `GF(2^3)` com redutor `x^3 + x + 1`, equivalente a `alpha^3 = alpha + 1`: `101` representa `x^2 + 1` e `011` representa `x + 1`. Como polinômios sobre `GF(2)`, o produto é `x^3 + x^2 + x + 1`, isto é, `1111`. Como elemento de `GF(2^3)`, reduzimos `x^3 = x + 1`, então sobra `x^2`, isto é, `100`.
+- O slide usa a forma sistemática por avaliação: os `k` bytes de dados aparecem literalmente nos primeiros símbolos da palavra-código, e os `n-k` símbolos restantes são paridade calculada a partir do mesmo polinômio. Implementações reais podem calcular essa paridade por circuitos ou algoritmos cíclicos equivalentes, sem mudar a capacidade de correção.
 - “Sem erro de arredondamento” é importante: tudo é discreto e exato. Não há aproximação de ponto flutuante; se as tabelas e o polinômio estão corretos, transmissor e receptor fazem exatamente a mesma álgebra.
-- A conexão com CRC é conceitual: ambos usam polinômios sobre campos binários. CRC detecta erro calculando resto; Reed-Solomon usa estrutura algébrica mais rica para localizar e corrigir símbolos.
+- A conexão com CRC é conceitual: ambos usam polinômios sobre corpos finitos. CRC normalmente trabalha sobre `GF(2)`, com coeficientes bit a bit, e detecta erro calculando resto por um polinômio gerador. Reed-Solomon trabalha sobre `GF(2^m)`, com símbolos de `m` bits, e usa estrutura algébrica mais rica para localizar e corrigir símbolos.
 - O custo é processamento e overhead. RS(255,239), por exemplo, adiciona 16 bytes de paridade a 239 bytes de dados; a taxa é `239/255 approx 0,937`. RS(255,223) adiciona 32 bytes; taxa `223/255 approx 0,875`.
 
 ## Slide 66 — Decodificação RS: síndromes e localizador
 
 - Síndrome é um resumo algébrico do erro. Se a palavra recebida é uma palavra-código válida, todas as síndromes esperadas dão zero. Se alguma síndrome não zera, há erro detectado.
 - As síndromes não dizem diretamente “o byte 17 está errado por valor 0x3A”. Elas misturam posições e magnitudes dos erros em somas no corpo finito.
-- A expressão `S_j = sum e_l X_l^j` se parece com uma soma de exponenciais. As incógnitas são `X_l`, que codificam posições, e `e_l`, que são magnitudes dos erros. Resolver RS é separar essas duas informações.
+- Como a teoria anterior definiu RS por avaliação, usamos checks que zeram para qualquer polinômio de grau menor que `k`: `S_r = sum_i y_i X_i^r`, com `r = 1, ..., n-k`. Se não houver erro, `y_i = f(X_i)` e a soma zera pelas propriedades das potências dos elementos não nulos do corpo finito.
+- A expressão `S_r = sum e_l X_{i_l}^r` se parece com uma soma de exponenciais. As incógnitas são `X_{i_l}`, que codificam posições, e `e_l`, que são magnitudes dos erros. Resolver RS é separar essas duas informações.
 - O polinômio localizador `Lambda(z)` tem raízes relacionadas às posições dos erros. Em vez de guardar uma lista de posições, ele guarda um polinômio cujas raízes revelam essas posições.
-- Berlekamp-Massey encontra o menor polinômio localizador compatível com a sequência de síndromes. Ele é análogo a encontrar a menor relação de recorrência que explica a sequência observada.
-- Chien search testa candidatos sistematicamente: avalia `Lambda(z)` nas potências do campo. Quando dá zero, encontrou uma raiz; a raiz aponta para uma posição corrompida.
-- Essa etapa descobre onde estão os erros, mas ainda não sabe quanto corrigir em cada posição. Por isso o próximo slide precisa do avaliador de erro e da fórmula de Forney.
-- Para aula, o ponto mais importante é a separação: síndromes detectam e resumem; localizador acha posições; avaliador/Forney acha valores; por fim corrige-se o bloco.
+- O ponto que prepara o próximo slide é: se conseguirmos achar `Lambda(z)`, suas raízes revelam posições. Antes de Forney e das magnitudes, precisamos entender como as síndromes viram esse localizador.
 
-## Slide 67 — Decodificação RS: avaliador e Forney
+## Slide 67 — Berlekamp-Massey e Chien: como ler
+
+- Berlekamp-Massey não “adivinha” posições diretamente. Ele olha para a sequência de síndromes e procura a menor recorrência linear que explica essa sequência.
+- A razão de haver recorrência é simples: cada contribuição de erro tem a forma `e_l X_{i_l}^r`. Quando aumentamos `r`, essa contribuição é multiplicada sempre pelo mesmo `X_{i_l}`. Uma soma de poucos termos exponenciais desse tipo sempre satisfaz uma recorrência linear de baixa ordem.
+- Para `t` erros, a recorrência tem ordem `t`: `S_{r+t} + lambda_1 S_{r+t-1} + ... + lambda_t S_r = 0`. Os coeficientes `lambda_1, ..., lambda_t` são os coeficientes do localizador `Lambda(z)`.
+- Em um decodificador real, Berlekamp-Massey aumenta gradualmente o grau candidato de `Lambda(z)` quando encontra uma discrepância, isto é, quando a recorrência atual não prediz a próxima síndrome. Para aula, o essencial é entender o resultado: ele devolve a menor recorrência compatível com as síndromes disponíveis.
+- Se o grau encontrado for maior que `floor((n-k)/2)`, ou se depois a busca de raízes não bater, o receptor deve declarar falha. Isso evita corrigir para uma palavra errada.
+- Chien search é a etapa que transforma o polinômio localizador em posições. Ela testa todos os candidatos `z = alpha^{-i}`. Se `Lambda(alpha^{-i}) = 0`, então o fator correspondente `1 - X_i z` zera e a posição `i` é marcada como erro.
+- A separação didática fica: síndromes resumem o erro; Berlekamp-Massey acha a recorrência/localizador; Chien transforma raízes em índices; Forney calcula as magnitudes; a correção soma essas magnitudes nos símbolos recebidos.
+
+## Slide 68 — Decodificação RS: avaliador e Forney
 
 - Depois de Chien search, sabemos as posições dos erros. Falta saber a magnitude de cada erro, isto é, qual valor deve ser somado/subtraído naquele símbolo para restaurar a palavra-código.
 - O polinômio de síndromes `S(z)` empacota as síndromes em uma série formal. O avaliador `Omega(z)` combina `S(z)` com o localizador `Lambda(z)` e retém apenas termos até o grau de paridade.
+- A fórmula de Forney no slide está escrita para a indexação por avaliação usada aqui, com síndromes `S_1, ..., S_{n-k}`. Em outras convenções de síndrome, pode aparecer um fator extra de `X_{i_l}`; isso é uma diferença de indexação, não de princípio.
 - A fórmula de Forney calcula a magnitude do erro em cada posição usando `Omega`, `Lambda` e a derivada formal `Lambda'`. Ela evita resolver explicitamente um sistema linear para as magnitudes a cada bloco.
 - Derivada formal em `GF(2^8)` não é limite/calculo diferencial. É a regra algébrica de derivar polinômios: derivada de `a z^m` vira `m a z^(m-1)`, com os coeficientes interpretados no campo. Em característica 2, termos com expoente par podem desaparecer.
 - “Subtrair” em `GF(2^8)` é o mesmo que somar, porque a soma é XOR e cada elemento é seu próprio inverso aditivo. Assim, corrigir o símbolo é fazer XOR com a magnitude calculada do erro.
@@ -851,7 +879,53 @@
 - Por isso é comum manter CRC/FCS além da FEC. O Reed-Solomon tenta corrigir; o CRC ajuda a verificar se o resultado final faz sentido.
 - A cadeia `síndromes -> Berlekamp-Massey -> Chien -> Forney -> correção` é o fluxo clássico. Para o aluno, não é necessário decorar os detalhes algébricos, mas é importante entender a função de cada etapa.
 
-## Slide 68 — IL2P: alternativa moderna ao AX.25
+## Slide 69 — Exemplo trabalhado: codificação RS(7,3)
+
+- Este slide completa a simetria pedagógica com o módulo 5: antes de decodificar, mostramos explicitamente como a palavra transmitida é gerada.
+- O exemplo usa `RS(7,3)` sobre `GF(2^3)` para caber no slide. Ele não é o tamanho usado por IL2P, mas preserva a estrutura: `k=3` símbolos de mensagem viram `n=7` símbolos codificados.
+- A representação de bits usada no slide é `b_2 b_1 b_0`, correspondente ao elemento `b_2 alpha^2 + b_1 alpha + b_0`. Assim, `1 = 001`, `alpha = 010`, `alpha^2 = 100`, `alpha^3 = alpha + 1 = 011`, `alpha^4 = alpha^2 + alpha = 110`, `alpha^5 = alpha^2 + alpha + 1 = 111` e `alpha^6 = alpha^2 + 1 = 101`.
+- A tabela de conversão à direita evita que as potências de `alpha` pareçam mágicas. Por exemplo, `1 + alpha + alpha^2 = 001 xor 010 xor 100 = 111`, que é o elemento chamado `alpha^5` nessa escolha de campo.
+- O slide usa a forma sistemática por avaliação: os três símbolos da mensagem são diretamente os três primeiros símbolos da palavra-código. A mensagem é `m = [alpha^5, alpha^3, alpha^5]`, ou `111 011 111` em bits.
+- Para transformar esses três símbolos em uma palavra RS completa, o codificador interpola um polinômio de grau menor que `3` que passe pelos três pontos de mensagem: `f(1) = alpha^5`, `f(alpha) = alpha^3` e `f(alpha^2) = alpha^5`. Resolver esse sistema em `GF(2^3)` dá `f(x) = 1 + alpha x + alpha^2 x^2`.
+- Depois da interpolação, codificar por avaliação significa calcular `c_i = f(X_i)` nos sete pontos `X_i = alpha^i`, para `i = 0, ..., 6`. Os três primeiros valores reproduzem a mensagem; os quatro últimos são paridade. O resultado é `c = [alpha^5, alpha^3, alpha^5, alpha^6, alpha^6, alpha^3, 1]`.
+- A forma por coeficientes que aparece em muitos textos é uma representação linear equivalente do mesmo código. A forma sistemática é mais útil aqui porque, depois da decodificação, recuperar a mensagem significa simplesmente ler os primeiros `k` símbolos corrigidos.
+- A palavra codificada também é apenas uma sequência de bits quando vai ao canal: `111 011 111 101 101 011 001`. O ponto didático é que RS opera em símbolos, mas esses símbolos são grupos finitos de bits; em RS real sobre `GF(2^8)`, cada símbolo é um byte.
+
+## Slide 70 — Exemplo trabalhado: canal e síndromes
+
+- Como `n-k = 4`, há quatro símbolos de redundância e a capacidade é `t = (n-k)/2 = 2` erros de posição desconhecida. Por isso calculamos quatro síndromes, `S_1` a `S_4`.
+- O canal altera duas posições. Na posição `2`, soma-se `e_2 = alpha^3`, então `alpha^5 + alpha^3 = alpha^2`. Na posição `6`, soma-se `e_6 = 1`, então `1 + 1 = 0`.
+- O receptor não sabe `c` nem `e`; ele só recebe `y`. O slide mostra `c` porque estamos construindo um exemplo didático passo a passo, mas a decodificação usa apenas as síndromes calculadas a partir de `y`. As posições erradas não são destacadas nessa etapa justamente para não sugerir que o algoritmo as conhece de antemão.
+- Como `c` veio de avaliações de grau menor que `3`, os checks `S_r = sum_i c_i X_i^r` zeram para `r = 1,2,3,4`. Portanto, as síndromes de `y = c + e` são exatamente as síndromes do erro: `S_r = e_2 (alpha^2)^r + e_6 (alpha^6)^r`.
+- No corpo do slide, as contas de síndrome são abertas usando diretamente `y` e `X_i`; isso evita sugerir que o receptor conhece `e_2` e `e_6`. A interpretação em termos de erro é para as notas e para a conferência da conta.
+- Os resultados são `S_1 = alpha`, `S_2 = alpha^4`, `S_3 = alpha` e `S_4 = alpha^6`. Eles não dizem diretamente quais posições estão erradas; eles são uma mistura algébrica das duas posições e das duas magnitudes.
+
+## Slide 71 — Exemplo trabalhado: localizador
+
+- Com dois erros, o localizador tem grau 2: `Lambda(z) = 1 + lambda_1 z + lambda_2 z^2`. Suas raízes são `X_{i_l}^{-1}`, onde `X_{i_l} = alpha^{i_l}` representa o ponto de avaliação associado à posição errada.
+- O motivo da recorrência `S_{r+2} + lambda_1 S_{r+1} + lambda_2 S_r = 0` é que, se `z = X_{i_l}^{-1}` é raiz, então `X_{i_l}^2 + lambda_1 X_{i_l} + lambda_2 = 0` depois de multiplicar por `X_{i_l}^2`. Multiplicando essa relação por `e_l X_{i_l}^r` e somando sobre os erros, obtemos a relação entre síndromes.
+- Substituindo as síndromes do exemplo, o sistema fica `alpha + lambda_1 alpha^4 + lambda_2 alpha = 0` e `alpha^6 + lambda_1 alpha + lambda_2 alpha^4 = 0`. A solução é `lambda_1 = 1` e `lambda_2 = alpha`.
+- Portanto `Lambda(z) = 1 + z + alpha z^2`. Esse polinômio já contém as posições dos erros, mas de forma indireta: é preciso procurar suas raízes no corpo finito.
+
+## Slide 72 — Exemplo trabalhado: busca de Chien
+
+- A busca de Chien avalia o localizador em `z = alpha^{-i}` para todas as posições possíveis `i = 0,...,6`. É uma busca exaustiva curta e estruturada, não uma tentativa aleatória.
+- Quando `Lambda(alpha^{-i}) = 0`, encontramos uma raiz e, portanto, uma posição de erro. No exemplo, isso acontece para `i = 2` e `i = 6`.
+- A inversão aparece porque o localizador foi escrito como `Lambda(z) = product_l (1 - X_{i_l} z)`. Se o erro está na posição `i_l`, associada ao ponto `X_{i_l}`, a raiz do polinômio é `z = X_{i_l}^{-1}`.
+- Este é o ponto em que o decodificador descobre onde estão os erros. Ele ainda não sabe as magnitudes; isso vem no próximo slide.
+
+## Slide 73 — Exemplo trabalhado: magnitudes e correção
+
+- O avaliador `Omega(z)` combina as síndromes com o localizador. No exemplo, `S(z) = alpha + alpha^4 z + alpha z^2 + alpha^6 z^3` e `Lambda(z) = 1 + z + alpha z^2`.
+- Multiplicando e truncando módulo `z^4`, obtemos `Omega(z) = alpha + alpha^2 z`. Como o módulo é `z^4`, tomar `mod z^4` significa manter apenas os termos de grau `0`, `1`, `2` e `3`; termos com `z^4` ou maior são descartados. O truncamento aparece porque só temos `n-k = 4` síndromes disponíveis.
+- A derivada formal de `Lambda(z)` é `Lambda'(z) = (1 + z + alpha z^2)' = 1 + 2 alpha z = 1`. Aqui `Lambda(z)` é um polinômio em `z` cujos coeficientes estão em `GF(2^m)`. O expoente `2` começa como inteiro comum na regra formal `D(a z^n) = n a z^(n-1)`, mas `n a` significa somar `a` consigo mesmo `n` vezes dentro do corpo. Como a característica é `2`, `2 alpha = alpha + alpha = 0`, então o termo `alpha z^2` desaparece.
+- A fórmula de Forney calcula a magnitude em cada posição encontrada: `e_i = -Omega(X_i^{-1}) / Lambda'(X_i^{-1})`. Em característica 2, o sinal de menos não muda o valor.
+- Para `X_2 = alpha^2`, avaliamos `Omega(alpha^5)` e obtemos `e_2 = alpha^3`. Para `X_6 = alpha^6`, avaliamos `Omega(alpha)` e obtemos `e_6 = 1`.
+- A correção é somar a magnitude do erro ao símbolo recebido: `y_2 + e_2 = alpha^2 + alpha^3 = alpha^5` e `y_6 + e_6 = 0 + 1 = 1`. Assim, recuperamos os dois símbolos originais da palavra `c`.
+- Como a codificação foi sistemática, a mensagem original está nos três primeiros símbolos corrigidos: `[c_0, c_1, c_2] = [alpha^5, alpha^3, alpha^5]`. Portanto, a decodificação recuperou a palavra-código e, ao mesmo tempo, tornou direta a leitura da mensagem.
+- O fluxo completo agora ficou visível: as síndromes resumem os erros; o localizador separa as posições; Chien transforma raízes em índices; Forney calcula magnitudes; a soma final corrige os símbolos.
+
+## Slide 74 — IL2P: alternativa moderna ao AX.25
 
 - `IL2P` significa Improved Layer 2 Protocol. Ele tenta preservar o uso prático de packet radio/APRS, mas substitui partes frágeis do AX.25 tradicional em canais ruidosos.
 - A motivação principal é que AX.25 sem FEC descarta o frame inteiro se um único bit passar errado pelo FCS. Em canal marginal, isso transforma pequenos erros em perda total de pacote.
@@ -863,7 +937,7 @@
 - “ISS ainda não suporta IL2P” é importante operacionalmente: para APRS via ISS, use AX.25/APRS tradicional no modo aceito pela estação espacial. IL2P é relevante para redes/digipeaters modernos que explicitamente o suportam.
 - FEC não resolve colisão de pacotes. Se dois usuários transmitem simultaneamente e o receptor captura ou mistura sinais de forma severa, Reed-Solomon pode não ter bloco utilizável para corrigir.
 
-## Slide 69 — IL2P: ganho de codificação no orçamento
+## Slide 75 — IL2P: ganho de codificação no orçamento
 
 - Ganho de codificação é a redução de `Eb/N0` necessária para atingir a mesma taxa de erro final quando usamos FEC. Se um sistema precisa de `23 dB` sem FEC e `20 dB` com FEC, o ganho prático é `3 dB`.
 - O ganho não vem de RF mais forte; vem de usar redundância para recuperar bits/símbolos que chegaram corrompidos. É uma troca: menor taxa útil e mais processamento por maior robustez.
@@ -874,7 +948,7 @@
 - Comparar FEC com antena/LNA/potência é útil porque todos compram margem com custos diferentes. Antena maior custa tamanho e apontamento; LNA custa hardware e alimentação; potência custa bateria e aquecimento; FEC custa overhead, latência e CPU.
 - O limite é que FEC não substitui boas práticas RF. Se a antena está mal casada, o áudio está saturado, o Doppler está fora, o cabo está irradiando ou há colisão constante, FEC apenas melhora uma parte do problema.
 
-## Slide 70 — Síntese do módulo
+## Slide 76 — Síntese do módulo
 
 - A síntese deve ser lida como encadeamento, não como lista solta. O módulo começa em regulamentação e termina em FEC porque um enlace real depende de tudo: autorização para transmitir, antena que irradia, linha que entrega potência, receptor com ruído aceitável e protocolo que sobrevive a erros.
 - Radioamadorismo aparece como laboratório legal de RF. Ele permite experimentar antenas, satélites e modos digitais, mas sempre dentro de faixas, classes, identificação, potência, homologação/certificação aplicável e responsabilidade operacional.
