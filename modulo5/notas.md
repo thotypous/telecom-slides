@@ -801,6 +801,8 @@
 - A métrica de ramo mede o custo ou a compatibilidade de uma transição específica com o par recebido naquele instante. Em hard-decision, essa métrica pode ser a distância de Hamming entre o par esperado e o par recebido.
 - A métrica de caminho é a soma acumulada das métricas de ramo desde o início até o nó atual. Em uma formulação de custo, menor métrica é melhor. Em uma formulação de correlação soft, maior métrica pode ser melhor.
 - O princípio do sobrevivente é: se dois caminhos chegam ao mesmo estado no mesmo instante, o futuro desses dois caminhos será afetado da mesma forma a partir dali, porque o estado resume toda a memória relevante. Portanto, o caminho pior nunca poderá se tornar melhor depois e pode ser descartado.
+- Essa é a prova de otimalidade global do Viterbi para a métrica escolhida. Se a métrica total é aditiva ao longo da treliça e o estado resume toda a memória relevante do encoder, vale o princípio de optimalidade de Bellman: o prefixo de um caminho ótimo até um estado também precisa ser o melhor prefixo para aquele estado. Assim, descartar caminhos piores que chegam ao mesmo estado não perde a solução ótima.
+- Portanto, com estado inicial/final corretamente definidos e métrica coerente com o canal, o Viterbi encontra o caminho globalmente ótimo na treliça. Ele não é uma heurística de busca local; é programação dinâmica exata sobre aquele modelo.
 - Essa propriedade é o motivo de o algoritmo ser eficiente. Sem ela, o número de caminhos cresceria como `2^n`. Com Viterbi, o custo por instante é proporcional ao número de estados e transições da treliça.
 - O traceback acontece no fim. O algoritmo guarda, para cada estado e tempo, de qual estado anterior veio o sobrevivente. Depois escolhe o estado final e caminha para trás recuperando os bits.
 - Quando há cauda, o estado final esperado é conhecido. No exemplo pequeno, os dois bits de cauda forçam o estado final `00`. Em Wi-Fi, os `6` bits de tail cumprem a mesma função para a memória `6`.
@@ -902,6 +904,8 @@
 ## Slide 64 — Algoritmo min-sum
 
 - Min-sum é uma aproximação simples e barata do algoritmo sum-product, que por sua vez é uma forma de _belief propagation_ no grafo de Tanner. A ideia é trocar mensagens entre bits e checks para refinar LLRs.
+- A comparação com Viterbi é importante: Viterbi é programação dinâmica exata na treliça para uma métrica aditiva; min-sum não tem essa garantia geral em um grafo LDPC real. Em um grafo sem ciclos, isto é, uma árvore, a passagem de mensagens é exata: depois de mensagens suficientes, cada nó recebeu informação independente de todo o resto do grafo. Nesse caso, sum-product calcula marginais exatas, e a versão max-product/min-sum calcula decisões ótimas para a métrica correspondente.
+- LDPC prático não é árvore. O grafo de Tanner tem ciclos, e as mensagens podem voltar para uma região do grafo por caminhos diferentes, deixando de ser independentes. Por isso, em LDPC real, min-sum deve ser lido como algoritmo iterativo aproximado: muito eficiente na prática, mas sem prova geral de convergência, de ótimo global ou mesmo de ótimo local no sentido clássico de otimização contínua.
 - A mensagem é extrínseca: quando um check calcula uma mensagem para um bit, ele usa os outros bits conectados àquele check, não o próprio bit de destino. Isso evita realimentar imediatamente para o bit a informação que veio dele mesmo.
 - Com a convenção `0 -> -1` e `1 -> +1`, uma equação XOR igual a zero impõe um produto de sinais. Para um check de grau `d`, o produto esperado dos sinais é `(-1)^d`. Isso vem do fato de que um número par de bits `1` deve participar do XOR.
 - O sinal da mensagem check->bit diz qual sinal aquele check gostaria que o bit tivesse para a paridade fechar, considerando os sinais atuais dos outros bits.
@@ -940,6 +944,7 @@
 - Agora, se calcularmos a síndrome com essas decisões, todos os checks ficam consistentes. O slide evita usar a síndrome como passo algorítmico principal, mas a verificação `H x_hat^T = 0` é uma forma natural de testar parada.
 - Não é garantido que uma única iteração resolva sempre. Em códigos reais e canais mais difíceis, o decoder repete troca de mensagens, atualização e teste de parada.
 - Também não é garantido que min-sum sempre encontre a palavra correta. Ele pode convergir para uma palavra errada, oscilar ou ficar preso por estruturas do grafo como trapping sets. O CRC/PER continua sendo importante no sistema completo.
+- Quando min-sum falha, a falha não deve ser entendida simplesmente como “caiu em um mínimo local” no mesmo sentido de gradiente descendente. A literatura de LDPC fala muito em ciclos curtos, trapping sets e pseudocodewords: estruturas do grafo e das mensagens que tornam uma configuração errada estável ou atraente para o decoder iterativo.
 
 ## Slide 68 — Como a matriz H é escolhida?
 
