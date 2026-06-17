@@ -98,7 +98,7 @@ def main() -> None:
     ax.text(
         0,
         -2.22,
-        r"Exemplo: em 145,8 MHz, $\lambda \approx 2{,}06\,$m e $\lambda/(2\pi) \approx 33\,$cm",
+        r"Exemplo: em 437,825 MHz, $\lambda \approx 68{,}5\,$cm e $\lambda/(2\pi) \approx 10{,}9\,$cm",
         ha="center",
         va="center",
         fontsize=11.5,

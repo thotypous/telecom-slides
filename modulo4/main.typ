@@ -37,7 +37,7 @@
   - Como projetar uma antena Yagi-Uda; como funcionam _hairpin_, _gamma match_ e baluns.
   - Como o PyNEC (NEC2++) e o OpenEMS simulam antenas: Método dos Momentos (MoM) e FDTD.
   - Como usar o NanoVNA para aferir antenas e conectar medidas com simulação.
-  - Como calcular _link budget_ para um enlace com satélite (foco na ISS em 145,825 MHz).
+  - Como calcular _link budget_ para um enlace com satélite (foco na ISS em 437,825 MHz).
   - APRS sobre AX.25; introdução a Reed-Solomon; IL2P como substituto moderno.
 ]
 
@@ -199,8 +199,8 @@
     [40 m], [7,0--7,3 MHz], [todas até 7,047; A/B além], [NVIS diurno; DX noturno],
     [20/17/30 m], [várias], [*só Classe A*], [DX; 30 m CW/dados],
     [15/12/10/6 m], [várias], [todas; 15 m parcial], [ciclo solar; Es/TEP],
-    [*2 m*], [144--148 MHz], [todas], [repetidoras, APRS, *SAT 145,8--146*],
-    [*70 cm*], [430--440 MHz], [todas], [repetidoras, *SAT 435--438*],
+    [*2 m*], [144--148 MHz], [todas], [repetidoras, APRS terrestre, *SAT 145,8--146*],
+    [*70 cm*], [430--440 MHz], [todas], [repetidoras, *SAT 435--438*, APRS ISS 437,825],
     [Outras V/U/SHF], [220; 902--907,5; 915--928; 1240 MHz+], [todas], [1,3 m, 33 cm, 23 cm e micro-ondas],
   )
 
@@ -241,14 +241,14 @@
       #set text(size: 16pt)
       *Pontos nodais:*
       - Frequência nacional de chamada FM: *146,520 MHz*.
-      - *145,825 MHz*: #link("https://www.ariss.org/current-status-of-iss-stations.html")[APRS ISS]; alias `ARISS`/`APRSAT`, indicativo conforme status ARISS.
+      - *145,825 MHz*: QRG histórica do APRS ISS; confira o #link("https://www.ariss.org/current-status-of-iss-stations.html")[status ARISS] antes de operar.
       - Offset típico em 2 m: 600 kHz; acima de 146,990 MHz há inversão do sentido entrada/saída no plano.
       - #text(size: 12pt)[Resumo didático: modos e aplicações variam por subfaixa; consulte o #link("https://informacoes.anatel.gov.br/legislacao/atos-de-requisitos-tecnicos-de-gestao-do-espectro/2024/1919-ato-926")[Ato Anatel 926/2024] para operação real.]
 
-      *Oportunidades para este módulo:*
-      - Construir Yagi de 3 elementos para 145,8 MHz.
-      - Fazer digipeating via ISS, ver o pacote voltar em outra região do continente.
-      - APRSdroid (Android) + rádio portátil + Yagi apontada.
+      *Para este módulo:*
+      - 2 m fica como referência de plano de banda e tamanho de antenas.
+      - APRS terrestre brasileiro continua em 145,570 MHz.
+      - APRS atual da ISS será tratado na banda de 70 cm.
     ],
   )
 ]
@@ -287,7 +287,8 @@
       #set text(size: 17pt)
       *Notas:*
       - Janela SAT de 3 MHz (3× maior que a de 2 m): vários cubesats FM/SSB/digitais.
-      - *Doppler é significativo em 70 cm*: $ Delta f_max approx 437 dot ("7,5"/3 dot 10^5) approx plus.minus$ 10,9 kHz, várias larguras SSB. Em 2 m cabe dentro do canal FM.
+      - *437,825 MHz*: #link("https://www.ariss.org/current-status-of-iss-stations.html")[APRS ISS atual] no módulo Zvezda/RS0ISS; caminho `ARISS` conforme status.
+      - *Doppler é significativo em 70 cm*: $ Delta f_max approx 437,825 dot ("7,5"/3 dot 10^5) approx plus.minus$ 11,0 kHz. FM largo ajuda; passos de sintonia melhoram os extremos.
       - Repetidoras de 70 cm: entrada 434--435 MHz, saída 439--440 MHz; offset de 5 MHz.
       - #text(size: 12pt)[Resumo didático: modos e aplicações variam por subfaixa; consulte o #link("https://informacoes.anatel.gov.br/legislacao/atos-de-requisitos-tecnicos-de-gestao-do-espectro/2024/1919-ato-926")[Ato Anatel 926/2024] para operação real.]
       - Antena Yagi de 70 cm é interessante: elementos curtos (\~34 cm totais) cabem em cima da mesa.
@@ -375,16 +376,16 @@
     columns: (1fr, 1fr),
     gutter: 0.8em,
     [
-      - $lambda = c/f$: em 145,8 MHz, $lambda approx$ 2,06 m.
+      - $lambda = c/f$: em 437,825 MHz, $lambda approx$ 68,5 cm.
       - Antenas são projetadas em *frações de* $lambda$: comprimento físico em metros não diz muito.
       - Para antenas pequenas, campo próximo reativo ($r lt.double lambda/(2 pi)$): termos $1/r^2$ e $1/r^3$ dominam; energia *armazenada*, não radiada.
       - Para antenas grandes, a região reativa cresce com $D$; campo distante exige $r gt.double lambda, D$ e, para Fraunhofer, $r gt 2D^2/lambda$.
       - Na transição, as duas regiões se misturam; por isso o entorno próximo de uma antena parece "circuito" e o longe "onda".
 
-      #text(size: 14pt)[*Exemplo:* a $f = $ 145,8 MHz, a fronteira $lambda/(2 pi)$ fica a $approx$ 33 cm. Dentro dessa distância, o que parece "campo" interage com o próprio radiador.]
+      #text(size: 14pt)[*Exemplo:* a $f = $ 437,825 MHz, a fronteira $lambda/(2 pi)$ fica a $approx$ 10,9 cm. Dentro dessa distância, o que parece "campo" interage com o próprio radiador.]
     ],
     [
-      // Figura: antena no centro com duas regiões radiais: campo próximo r << lambda/(2pi), dominado por termos reativos 1/r^2 e 1/r^3, e campo distante r >> lambda/(2pi), dominado por termos radiados 1/r. Incluir exemplo numérico: lambda/(2pi) approx 33 cm em 145,8 MHz.
+      // Figura: antena no centro com duas regiões radiais: campo próximo r << lambda/(2pi), dominado por termos reativos 1/r^2 e 1/r^3, e campo distante r >> lambda/(2pi), dominado por termos radiados 1/r. Incluir exemplo numérico: lambda/(2pi) approx 10,9 cm em 437,825 MHz.
       #align(center)[#image("fig/campo_proximo_distante.svg", width: 100%)]
     ],
   )
@@ -1418,19 +1419,16 @@
     columns: (1fr, 1fr),
     gutter: 0.7em,
     [
-      Para ISS APRS a *145,825 MHz*:
+      Para APRS da ISS a *437,825 MHz*:
       #align(center)[
-        #text(size: 12pt)[$ Delta f_max approx "145,8" " MHz" dot 7500/(3 dot 10^8) approx plus.minus "3,6" " kHz" $]
+        #text(size: 12pt)[$ Delta f_max approx "437,825" " MHz" dot 7500/(3 dot 10^8) approx plus.minus "11,0" " kHz" $]
       ]
-      - Cabe dentro do canal FM (passa-faixa $approx 15$ kHz).
-      - Correção Doppler geralmente dispensável em FM/AFSK.
+      - Fica da ordem da largura útil de um canal FM estreito.
+      - FM largo pode bastar em boas condições; passos/CAT aumentam a margem.
 
-      Para um satélite em UHF a *437 MHz*:
-      #align(center)[
-        #text(size: 12pt)[$ Delta f_max approx plus.minus "10,9" " kHz" $]
-      ]
-      - É várias larguras de canal SSB.
-      - *Precisa* compensar Doppler (manualmente ou com software de rastreio).
+      Na QRG histórica de *145,825 MHz*:
+      #align(center)[#text(size: 12pt)[$ Delta f_max approx plus.minus "3,6" " kHz" $]]
+      - Cabia com folga no FM/AFSK; em 70 cm, o ajuste triplica.
     ],
     [
       // Figura: geometria de passagem de satélite em LEO sobre uma estação terrena. Arco da órbita da ISS de AOS (aquisição) passando por TCA (zênite) até LOS (perda de sinal). Em cada ponto, vetor velocidade v da ISS e sua projeção radial v_r em direção à estação. Gráfico abaixo: frequência recebida ao longo do tempo formando curva S: começa em f0 + Delta f_max (aproximação), cruza f0 no zênite, termina em f0 - Delta f_max (afastamento).
@@ -1519,7 +1517,7 @@
 // SLIDE 54 — APRS via ISS
 // ============================================================
 #slide[
-  == Exemplo: APRS via ISS (145,825 MHz, LEO)
+  == Exemplo: APRS via ISS (437,825 MHz, LEO)
 
   #set text(size: 13pt)
   #grid(
@@ -1528,13 +1526,14 @@
     [
       *Geometria e parâmetros*:
       - ISS altitude $approx$ 400 km, $v approx$ 7,5 km/s.
-      - Frequência 145,825 MHz, $lambda approx$ 2,06 m.
-      - #link("https://www.ariss.org/current-status-of-iss-stations.html")[APRS ISS]: 145,825 MHz; alias `ARISS`/`APRSAT`, indicativo conforme status ARISS.
+      - Frequência 437,825 MHz, $lambda approx$ 68,5 cm.
+      - #link("https://www.ariss.org/current-status-of-iss-stations.html")[APRS ISS]: ativo em 437,825 MHz no módulo Zvezda; indicativo RS0ISS.
       - Janela útil AOS--LOS: $approx$ 4--10 min.
 
       *Setup do aluno*:
-      - HT VHF 5 W FM (ex.: Baofeng UV-5R ou similar).
-      - Yagi de 3 elementos de fita métrica, casada (SWR $approx 1$).
+      - HT UHF/dual-band 5 W FM ou menos.
+      - Yagi de 70 cm, 3--5 elementos, casada (SWR $approx 1$).
+      - FM largo; opcionalmente, memórias Doppler ou Gpredict/CAT.
       - APRSdroid no celular + cabo de áudio.
       - Modulação AFSK Bell 202, AX.25 UI, APRS.
     ],
@@ -1547,18 +1546,18 @@
           stroke: 0.4pt,
           align: (left, right, left),
           [EIRP], [+11,5], [dBW],
-          [FSPL (400 km)], [-127,8], [dB],
+          [FSPL (400 km)], [-137,3], [dB],
           [Atmos + iono], [-1,8], [dB],
           [Apontamento], [-1,0], [dB],
           [Polarização], [-3,0], [dB],
-          [$+ G_r$ (whip ISS)], [+2,1], [dBi],
-          [$P_"sinal"$], [-120,0], [dBW],
+          [$+ G_r$ (antena ISS)], [+2,1], [dBi],
+          [$P_"sinal"$], [-129,5], [dBW],
         )
       ]
 
-      $E_b\/N_0$ ideal no TCA: $approx$ 48 dB; a 10° de elevação ($d approx$ 1440 km): $approx$ 37 dB.
+      $E_b\/N_0$ ideal no TCA: $approx$ 38 dB; a 10° de elevação ($d approx$ 1440 km): $approx$ 27 dB.
       Limiar AFSK/FM BER $10^(-5)$ = 23,2 dB.
-      Margem prática: colisões, captura FM, polarização, fading, áudio e squelch.
+      Margem prática menor: Doppler, colisões, captura FM, polarização, fading, áudio e squelch.
 
       ACKs reais podem ficar bem abaixo do orçamento ideal.
     ],
@@ -1636,14 +1635,14 @@
     [Disponibilidade], [Janelas de $approx$ 4--10 min, poucas por dia], [24/7 enquanto no footprint],
     [Footprint no Brasil], [Todo o território (passagens variam)], [Leste/centro-leste; NE $approx$ 20°, SE $approx$ 7°, S $<$ 5°],
     [Rastreio], [Software (ex. Gpredict), antena móvel ou apontar à mão], [Antena *fixa*, azimute/elevação constantes],
-    [Doppler], [$plus.minus$ 3,6 kHz em VHF; $plus.minus$ 11 kHz em UHF], [Geométrico *zero*; deriva do LNB importa],
-    [Frequências], [APRS 145,825 MHz; voz tip. 145,990 up / 437,800 down], [S 2,4 GHz (up) / X 10 GHz (down)],
-    [Antenas típicas], [Yagi 3--5 el. de 2 m; chicote no 2 m], [Parabólica 60--90 cm + hélice/feed 2,4 GHz],
+    [Doppler], [$plus.minus$ 11 kHz no APRS UHF; $plus.minus$ 3,6 kHz em VHF], [Geométrico *zero*; deriva do LNB importa],
+    [Frequências], [APRS 437,825 MHz; voz tip. 145,990 up / 437,800 down], [S 2,4 GHz (up) / X 10 GHz (down)],
+    [Antenas típicas], [Yagi 3--5 el. de 70 cm para APRS; dual-band para voz], [Parabólica 60--90 cm + hélice/feed 2,4 GHz],
     [Modos], [FM voz/repetidora, AFSK/AX.25 (APRS), SSTV eventual], [SSB, CW, digitais, DATV],
     [Cadeia RX], [Rádio FM/SSB direto], [*LNB + SDR* (IF 740 MHz) obrigatório],
-    [FSPL típica], [$approx$ 128 dB (2 m, zênite)], [$approx$ 204 dB (10 GHz)],
+    [FSPL típica], [$approx$ 137 dB (70 cm, zênite)], [$approx$ 204 dB (10 GHz)],
     [Ganho de antena], [$approx$ 7 dBi (Yagi 3 el.)], [$approx$ 35 dBi (parábola 60 cm)],
-    [Orçamento ($P_"sinal"$)], [$approx$ -120 dBW (TCA)], [$approx$ -127 dBW (contínuo)],
+    [Orçamento ($P_"sinal"$)], [$approx$ -129,5 dBW (TCA)], [$approx$ -127 dBW (contínuo)],
   )
 
   #v(0.2em)
@@ -1812,7 +1811,7 @@
   == Modulações AX.25/APRS (recap)
 
   #set text(size: 16pt)
-  *Bell 202 AFSK* (1200 bps, 2 m):
+  *Bell 202 AFSK* (1200 bps, FM VHF/UHF):
   - Tons: marca = 1200 Hz, espaço = 2200 Hz (áudio, passam via canal FM padrão).
   - AX.25 usa NRZI antes do AFSK; o preâmbulo usual são flags HDLC `0x7E` repetidas.
   - Entra no transceptor pelo microfone, sai do alto-falante ⇒ compatível com qualquer rádio FM.
@@ -2307,7 +2306,7 @@
   - *Yagi-Uda*: refletor indutivo + diretor capacitivo produzem endfire; casamento via dipolo dobrado, gamma ou hairpin.
   - *NanoVNA*: calibração com cabo + S11/S21 conectam medida com simulação; separa ressonância de casamento.
   - *Link budget*: Friis + G/T + $E_b\/N_0$ fecha quando margem $>= 6$ dB. Planilha AMSAT organiza tudo.
-  - *ISS (LEO) vs QO-100 (GEO)*: mesmos princípios, extremos opostos — rastreio+Doppler+VHF de um lado, antena fixa+SHF+parabólica do outro.
-  - *APRS/AX.25*: UI frames de broadcast; ISS como digi espacial em 145,825 MHz.
+  - *ISS (LEO) vs QO-100 (GEO)*: mesmos princípios, extremos opostos — rastreio+Doppler+VHF/UHF de um lado, antena fixa+SHF+parabólica do outro.
+  - *APRS/AX.25*: UI frames de broadcast; ISS como digi espacial em 437,825 MHz.
   - *Reed-Solomon e IL2P*: polinômio por pontos em GF($2^8$); ganho prático de 1--3 dB paga overhead.
 ]
